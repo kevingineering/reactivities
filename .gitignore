@@ -1,0 +1,9 @@
+bin
+obj
+.vscode
+.DS_Store
+
+#in case we have keys
+appsettings.json
+*.db
+notes.txt
