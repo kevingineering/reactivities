@@ -13,14 +13,15 @@ namespace Persistence
 
     //entity we are using - Values is table name in SQL
     public DbSet<Domain.Value> Values { get; set; }
+    public DbSet<Domain.Activity> Activities { get; set; }
 
     //adding data to database when migration is created
     protected override void OnModelCreating(ModelBuilder builder)
     {
       builder.Entity<Domain.Value>().HasData(
-        new Domain.Value { Id = 1, Name = "Value 101"},
-        new Domain.Value { Id = 2, Name = "Value 102"},
-        new Domain.Value { Id = 3, Name = "Value 103"}
+        new Domain.Value { Id = 1, Name = "Value 101" },
+        new Domain.Value { Id = 2, Name = "Value 102" },
+        new Domain.Value { Id = 3, Name = "Value 103" }
       );
     }
   }

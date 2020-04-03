@@ -1,3 +1,4 @@
+using MediatR;
 using Microsoft.AspNetCore.Builder; //IApplicationBuilder, UseDeveloperExceptionPage, UseRouting, useAuthorization, UseEndpoints
 using Microsoft.AspNetCore.Hosting; //IWebHostEnvironment
 using Microsoft.EntityFrameworkCore;  //UseSQLite
@@ -18,7 +19,8 @@ namespace API
     //represents key/value pair 
     public IConfiguration Configuration { get; }
 
-    // This method gets called by the runtime. Use this method to add services to the container (dependency injection)
+    // This method gets called by the runtime. 
+    //dependency injection container
     public void ConfigureServices(IServiceCollection services)
     {
       //UseSqlite takes connection string from configuration files
@@ -36,6 +38,8 @@ namespace API
         });
       });
 
+      //add mediatr - takes assembly, have to tell it about at least one class in assembly
+      services.AddMediatR(typeof(Application.Activities.List.Handler).Assembly);
       //adding controllers - previously AddMvc
       services.AddControllers();
     }

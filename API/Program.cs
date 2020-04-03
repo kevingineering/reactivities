@@ -23,9 +23,13 @@ namespace API
         //try to get database context and migrate database
         try {
           var context = services.GetRequiredService<Persistence.DataContext>();
+
           //applies pending migrations for the context to the database
           //will create database if it does not exist
           context.Database.Migrate();
+
+          //seed data if no activities in database
+          Persistence.Seed.SeedData(context);
         } catch (System.Exception ex) {
           //log error if one occurs
           var logger = services.GetRequiredService<ILogger<Program>>();
