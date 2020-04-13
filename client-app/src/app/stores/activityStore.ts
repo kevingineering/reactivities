@@ -22,9 +22,46 @@ class ActivityStore {
 
   //sorts activities by date
   @computed get activitiesByDate() {
-    return Array.from(this.activityRegistry.values()).sort(
+    return this.groupActivitiesByDate(Array.from(this.activityRegistry.values()))
+  }
+
+  groupActivitiesByDate(activities: IActivity[]) {
+    const sortedActivities = activities.sort(
       (a, b) => Date.parse(a.date) - Date.parse(b.date)
     )
+
+    //BREAKDOWN OF STEPS
+
+    //Object.entries produces an array of [string, IActivity]
+    // console.log('Object.entries(): ', Object.entries(sortedActivities))
+    //creates array of key(date)-value(activity[]) pairs 
+    // console.log('sortedActivities.reduce(): ', sortedActivities
+    //.reduce function creates accumulator from array by looking at each piece (currentValue) one at a time
+    // .reduce(
+    //   //callback function
+    //   (accumulator, currentValue) => {
+    //     //remove time from date
+    //     const date = currentValue.date.split('T')[0]
+    //     //compare dates and add to array if they match
+    //     accumulator[date] = accumulator[date] ? [...accumulator[date], currentValue] : [currentValue]
+    //     return accumulator
+    //   }
+    //   //initial value - key is activity date, and array is an array of activities
+    //   , {} as {[key: string]: IActivity[]}
+    // ))
+
+    return Object.entries(sortedActivities
+      .reduce(
+        (accumulator, currentValue) => {
+          const date = currentValue.date.split('T')[0]
+          accumulator[date] = accumulator[date] ? [...accumulator[date], currentValue] : [currentValue]
+          return accumulator
+        }
+        , {} as {[key: string]: IActivity[]}
+      )
+    )
+
+    // return sortedActivities
   }
 
   @action loadActivities = async () => {
@@ -38,6 +75,7 @@ class ActivityStore {
         })
         this.loadingInitial = false
       })
+      // console.log(this.groupActivitiesByDate(activities))
     } catch (error) {
       runInAction('load activities error', () => {
         this.loadingInitial = false
