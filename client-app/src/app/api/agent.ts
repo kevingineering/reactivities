@@ -1,11 +1,36 @@
 import axios, { AxiosResponse } from 'axios'
 import { IActivity } from '../models/Activity'
+import { history } from '../../index'
+import { toast } from 'react-toastify'
 
 //separate API calls from components
 //this file defines all api calls
 
 //base path - every call will start with this url
 axios.defaults.baseURL = 'http://localhost:5000/api'
+
+//intercept response errors
+//takes two parameters - what to do when response is fulfilled, what to do when response is rejected
+axios.interceptors.response.use(undefined, error => {
+  console.log(error.message)
+  if (error.message === 'Network Error' && !error.response) {
+    toast.error('Network error - make sure API is running!')
+  }
+  const {status, config, data} = error.response
+  if (status === 404) {
+    history.push('/notfound')
+  }
+
+  //verification error if path requiring GUID is not sent GUID
+  if (status === 400 && config.method === 'get' && data.errors.hasOwnProperty('id')) {
+    history.push('/notfound')
+  }
+
+  //check for internal server errors and display them with toastify
+  if (status === 500) {
+    toast.error('Server error - check the terminal for more info!')
+  }
+})
 
 //store request in a constant
 const responseBody = (response: AxiosResponse) => response.data

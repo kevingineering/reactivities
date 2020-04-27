@@ -22,7 +22,9 @@ class ActivityStore {
 
   //sorts activities by date
   @computed get activitiesByDate() {
-    return this.groupActivitiesByDate(Array.from(this.activityRegistry.values()))
+    return this.groupActivitiesByDate(
+      Array.from(this.activityRegistry.values())
+    )
   }
 
   groupActivitiesByDate(activities: IActivity[]) {
@@ -34,7 +36,7 @@ class ActivityStore {
 
     //Object.entries produces an array of [string, IActivity]
     // console.log('Object.entries(): ', Object.entries(sortedActivities))
-    //creates array of key(date)-value(activity[]) pairs 
+    //creates array of key(date)-value(activity[]) pairs
     // console.log('sortedActivities.reduce(): ', sortedActivities
     //.reduce function creates accumulator from array by looking at each piece (currentValue) one at a time
     // .reduce(
@@ -50,15 +52,14 @@ class ActivityStore {
     //   , {} as {[key: string]: IActivity[]}
     // ))
 
-    return Object.entries(sortedActivities
-      .reduce(
-        (accumulator, currentValue) => {
-          const date = currentValue.date.split('T')[0]
-          accumulator[date] = accumulator[date] ? [...accumulator[date], currentValue] : [currentValue]
-          return accumulator
-        }
-        , {} as {[key: string]: IActivity[]}
-      )
+    return Object.entries(
+      sortedActivities.reduce((accumulator, currentValue) => {
+        const date = currentValue.date.split('T')[0]
+        accumulator[date] = accumulator[date]
+          ? [...accumulator[date], currentValue]
+          : [currentValue]
+        return accumulator
+      }, {} as { [key: string]: IActivity[] })
     )
 
     // return sortedActivities
@@ -89,20 +90,20 @@ class ActivityStore {
     if (activity) {
       this.activity = activity
     } else {
-        try {
-          this.loadingInitial = true
-          activity = await agent.Activities.details(id)
-          runInAction('load activity', () => {
-            activity.date = activity.date.split('.')[0]
-            this.activity = activity
-            this.loadingInitial = false
-          })
-        } catch (error) {
-          runInAction('load activity error', () => {
-            this.loadingInitial = false
-            console.log(error)
-          })
-        }
+      try {
+        this.loadingInitial = true
+        activity = await agent.Activities.details(id)
+        runInAction('load activity', () => {
+          activity.date = activity.date.split('.')[0]
+          this.activity = activity
+          this.loadingInitial = false
+        })
+      } catch (error) {
+        runInAction('load activity error', () => {
+          this.loadingInitial = false
+          console.log(error)
+        })
+      }
     }
   }
 

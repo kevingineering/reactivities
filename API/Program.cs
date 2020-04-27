@@ -1,3 +1,4 @@
+using System; //Exception
 using Microsoft.AspNetCore.Hosting; //UseStartup
 using Microsoft.EntityFrameworkCore; //Migrate
 using Microsoft.Extensions.DependencyInjection; //CreateScope
@@ -21,7 +22,8 @@ namespace API
         //reference to services
         var services = scope.ServiceProvider;
         //try to get database context and migrate database
-        try {
+        try
+        {
           var context = services.GetRequiredService<Persistence.DataContext>();
 
           //applies pending migrations for the context to the database
@@ -30,7 +32,9 @@ namespace API
 
           //seed data if no activities in database
           Persistence.Seed.SeedData(context);
-        } catch (System.Exception ex) {
+        }
+        catch (Exception ex)
+        {
           //log error if one occurs
           var logger = services.GetRequiredService<ILogger<Program>>();
           logger.LogError(ex, "An error occured during migration.");
@@ -44,10 +48,10 @@ namespace API
     //CreateDefaultBuilder() - sets current directory as API.Startup class, loads configuration for project from appsettings.json, appsettings.<env>.json, and user secrets, and configures logging
     //configureWebHostDefaults() - configures app for Kestrel web server
     public static Microsoft.Extensions.Hosting.IHostBuilder CreateHostBuilder(string[] args) =>
-        Host.CreateDefaultBuilder(args)
-            .ConfigureWebHostDefaults(webBuilder =>
-            {
-              webBuilder.UseStartup<API.Startup>();
-            });
+      Host.CreateDefaultBuilder(args)
+        .ConfigureWebHostDefaults(webBuilder =>
+        {
+          webBuilder.UseStartup<API.Startup>();
+        });
   }
 }

@@ -1,4 +1,5 @@
 using System;
+using System.Net; //HttpStatusCode
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
@@ -25,8 +26,9 @@ namespace Application.Activities
       {
         var activity = await _context.Activities.FindAsync(request.Id);
 
+        //throw custom exception if activity is not found
         if (activity == null)
-          throw new Exception("Could not find activity.");
+          throw new Application.Errors.RestException(HttpStatusCode.NotFound, new {activity = "Not found."});
 
         _context.Remove(activity);
         

@@ -1,3 +1,4 @@
+using FluentValidation.AspNetCore;
 using MediatR;
 using Microsoft.AspNetCore.Builder; //IApplicationBuilder, UseDeveloperExceptionPage, UseRouting, useAuthorization, UseEndpoints
 using Microsoft.AspNetCore.Hosting; //IWebHostEnvironment
@@ -40,18 +41,26 @@ namespace API
 
       //add mediatr - takes assembly, have to tell it about at least one class in assembly
       services.AddMediatR(typeof(Application.Activities.List.Handler).Assembly);
+
       //adding controllers - previously AddMvc
-      services.AddControllers();
+      services.AddControllers()
+        .AddFluentValidation(cfg => {
+          //we give it Create class, but it registers all methods in that folder
+          cfg.RegisterValidatorsFromAssemblyContaining<Application.Activities.Create>();
+        });
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
     //can add middleware - order is important
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
-      //if in development mode, provide detailed information in case of error
+      //use custom error handling middleware
+      app.UseMiddleware<API.Middleware.ErrorHandlingMiddleware>();
+
+      //if in development mode, provide detailed information in case of error - otherwise return only error code
       if (env.IsDevelopment())
       {
-        app.UseDeveloperExceptionPage();
+        // app.UseDeveloperExceptionPage();
       }
 
       //requests coming in on HTTP are redirected to HTTPS

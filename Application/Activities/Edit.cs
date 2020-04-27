@@ -1,7 +1,9 @@
-using System;
-using System.Threading;
-using System.Threading.Tasks;
-using MediatR;
+using System; //Exception
+using System.Net; //HttpStatusCode
+using System.Threading; //CancellationToken
+using System.Threading.Tasks; //Task
+using FluentValidation; //AbstractValidator, RuleFor
+using MediatR; //IRequest, IRequestHandler, Unit
 
 namespace Application.Activities
 {
@@ -19,6 +21,20 @@ namespace Application.Activities
       public string Venue { get; set; }
     }
 
+    //Validation using FluentValidation
+    public class CommandValidator : AbstractValidator<Command>
+    {
+      public CommandValidator()
+      {
+        RuleFor(x => x.Title).NotEmpty();
+        RuleFor(x => x.Description).NotEmpty();
+        RuleFor(x => x.Category).NotEmpty();
+        RuleFor(x => x.Date).NotEmpty();
+        RuleFor(x => x.City).NotEmpty();
+        RuleFor(x => x.Venue).NotEmpty();
+      }
+    }
+
     public class Handler : IRequestHandler<Command>
     {
       private readonly Persistence.DataContext _context;
@@ -34,6 +50,10 @@ namespace Application.Activities
 
         if (activity == null)
           throw new Exception("Could not find activity.");
+
+        //throw custom exception if activity is not found
+        if (activity == null)
+          throw new Application.Errors.RestException(HttpStatusCode.NotFound, new { activity = "Not found." });
 
         //?? is null coalescing operator
         activity.Title = request.Title ?? activity.Title;

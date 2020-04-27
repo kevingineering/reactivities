@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc; //Route, ApiController, ControllerBase
 namespace API.Controllers
 {
   [Route("api/[controller]")]
+  //ApiController automatically removes bad requests
+  //ApiController also provides binding source parameter inference
   [ApiController]
   public class ActivitiesController : ControllerBase
   {

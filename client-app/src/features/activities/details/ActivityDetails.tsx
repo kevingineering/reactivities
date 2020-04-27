@@ -26,11 +26,15 @@ const ActivityDetails: React.FC<RouteComponentProps<DetailParams>> = (
   useEffect(() => {
     loadActivity(props.match.params.id)
     //eslint-disable-next-line
-  }, [loadActivity])
+  }, [])
 
-  return (loadingInitial || !activity) ? (
-    <LoadingComponent content="Loading activity..." />
-  ) : (
+  if (loadingInitial) 
+    return <LoadingComponent content="Loading activity..." />
+  
+  if (!activity)
+    return <h2>Not Found</h2>
+
+  return (
     <Grid>
       <Grid.Column width={10}>
         <ActivityDetailsHeader activity={activity}/>
