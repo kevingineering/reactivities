@@ -2,6 +2,8 @@ import { observable, action, computed, configure, runInAction } from 'mobx'
 import { createContext, SyntheticEvent } from 'react'
 import { IActivity } from '../models/Activity'
 import agent from '../api/agent'
+import { history } from '../../index'
+import { toast } from 'react-toastify'
 
 //ensures you cannot mutate state outside of an action
 configure({ enforceActions: 'always' })
@@ -12,7 +14,7 @@ class ActivityStore {
   //dynamic keyed observable map - list of activities from database
   @observable activityRegistry = new Map()
   //single activity set when 'View' button is clicked
-  @observable activity: IActivity | null = null
+  @observable currentActivity: IActivity | null = null
   //used when page first loads
   @observable loadingInitial = false
   //used when 'Submit' button is clicked on activity form
@@ -29,7 +31,7 @@ class ActivityStore {
 
   groupActivitiesByDate(activities: IActivity[]) {
     const sortedActivities = activities.sort(
-      (a, b) => Date.parse(a.date) - Date.parse(b.date)
+      (a, b) => a.date.getTime() - b.date.getTime()
     )
 
     //BREAKDOWN OF STEPS
@@ -54,7 +56,7 @@ class ActivityStore {
 
     return Object.entries(
       sortedActivities.reduce((accumulator, currentValue) => {
-        const date = currentValue.date.split('T')[0]
+        const date = currentValue.date.toISOString().split('T')[0]
         accumulator[date] = accumulator[date]
           ? [...accumulator[date], currentValue]
           : [currentValue]
@@ -71,7 +73,7 @@ class ActivityStore {
       const activities = await agent.Activities.list()
       runInAction('load activities', () => {
         activities.forEach((activity) => {
-          activity.date = activity.date.split('.')[0]
+          activity.date = new Date(activity.date)
           this.activityRegistry.set(activity.id, activity)
         })
         this.loadingInitial = false
@@ -88,16 +90,19 @@ class ActivityStore {
   @action loadActivity = async (id: string) => {
     let activity = this.getActivity(id)
     if (activity) {
-      this.activity = activity
+      this.currentActivity = activity
+      return activity
     } else {
       try {
         this.loadingInitial = true
         activity = await agent.Activities.details(id)
         runInAction('load activity', () => {
-          activity.date = activity.date.split('.')[0]
-          this.activity = activity
+          activity.date = new Date(activity.date)
+          this.currentActivity = activity
+          this.activityRegistry.set(activity.id, activity)
           this.loadingInitial = false
         })
+        return activity
       } catch (error) {
         runInAction('load activity error', () => {
           this.loadingInitial = false
@@ -121,10 +126,12 @@ class ActivityStore {
         this.activityRegistry.set(activity.id, activity)
         this.submitting = false
       })
+      history.push(`/activities/${activity.id}`)
     } catch (error) {
       runInAction('create activity error', () => {
         this.submitting = false
-        console.log(error)
+        console.log(error.response)
+        toast.error(error.response.data.title)
       })
     }
   }
@@ -135,13 +142,15 @@ class ActivityStore {
       await agent.Activities.edit(activity)
       runInAction('edit activity', () => {
         this.activityRegistry.set(activity.id, activity)
-        this.activity = activity
+        this.currentActivity = activity
         this.submitting = false
       })
+      history.push(`/activities/${activity.id}`)
     } catch (error) {
       runInAction('edit activity error', () => {
         this.submitting = false
-        console.log(error)
+        toast.error(error.response.title)
+
       })
     }
   }
@@ -169,7 +178,7 @@ class ActivityStore {
   }
 
   @action clearActivity = () => {
-    this.activity = null
+    this.currentActivity = null
   }
 }
 

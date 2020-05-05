@@ -7,7 +7,34 @@ export interface IActivity {
   title: string
   description: string
   category: string
-  date: string
+  date: Date
   city: string
   venue: string
+}
+
+//extends IActivity but makes all properties optional
+export interface IActivityFormValues extends Partial<IActivity> {
+  time?: Date
+}
+
+//when new instance is created it has these default values
+export class ActivityFormValues implements IActivityFormValues {
+  id?: string = undefined
+  title: string = ''
+  category: string = ''
+  description: string = ''
+  date?: Date = undefined
+  time?: Date = undefined
+  city: string = ''
+  venue: string = ''
+
+  //constructor lets you create it with existing activity
+  constructor(init?: IActivityFormValues) {
+    //copies all properties and values from this and overwrite them with values from init (if they exist on init)
+    Object.assign(this, init)
+    if (init && init.date) {
+      this.time = init.date
+    }
+
+  }
 }

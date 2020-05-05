@@ -18,7 +18,7 @@ const ActivityDetails: React.FC<RouteComponentProps<DetailParams>> = (
 ) => {
   const activityStore = useContext(ActivityStore)
   const {
-    activity,
+    currentActivity,
     loadActivity,
     loadingInitial,
   } = activityStore
@@ -31,14 +31,14 @@ const ActivityDetails: React.FC<RouteComponentProps<DetailParams>> = (
   if (loadingInitial) 
     return <LoadingComponent content="Loading activity..." />
   
-  if (!activity)
+  if (!currentActivity)
     return <h2>Not Found</h2>
 
   return (
     <Grid>
       <Grid.Column width={10}>
-        <ActivityDetailsHeader activity={activity}/>
-        <ActivityDetailedInfo activity={activity}/>
+        <ActivityDetailsHeader activity={currentActivity}/>
+        <ActivityDetailedInfo activity={currentActivity}/>
         <ActivityDetailedChats />
       </Grid.Column>
       <Grid.Column width={6}>

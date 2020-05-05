@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom'
 const HomePage = () => {
   return (
     <Segment inverted textAlign="center" vertical className="masthead">
-      <Header text>
+      <Header>
         <Header as="h1" inverted>
           <Image
             size="massive"

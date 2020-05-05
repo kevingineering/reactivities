@@ -1,6 +1,7 @@
 import React from 'react'
 import { Segment, Grid, Icon } from 'semantic-ui-react'
 import { IActivity } from '../../../app/models/Activity'
+import { format } from 'date-fns'
 
 interface IProps {
   activity: IActivity
@@ -25,7 +26,7 @@ const ActivityDetailedInfo: React.FC<IProps> = ({ activity }) => {
             <Icon name="calendar" size="large" color="teal" />
           </Grid.Column>
           <Grid.Column width={15}>
-            <span>{activity.date}</span>
+            <span>{format(activity.date, 'eeee MMMM do')} at {format(activity.date, 'h:mm a')}</span>
           </Grid.Column>
         </Grid>
       </Segment>

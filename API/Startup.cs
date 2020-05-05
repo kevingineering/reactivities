@@ -2,7 +2,7 @@ using FluentValidation.AspNetCore;
 using MediatR;
 using Microsoft.AspNetCore.Builder; //IApplicationBuilder, UseDeveloperExceptionPage, UseRouting, useAuthorization, UseEndpoints
 using Microsoft.AspNetCore.Hosting; //IWebHostEnvironment
-using Microsoft.EntityFrameworkCore;  //UseSQLite
+using Microsoft.EntityFrameworkCore; //UseSQLite
 using Microsoft.Extensions.Configuration; //GetConnectionString, IConfiguration
 using Microsoft.Extensions.DependencyInjection; //IServiceCollection, AddDbContext, AddControlers
 using Microsoft.Extensions.Hosting; //env

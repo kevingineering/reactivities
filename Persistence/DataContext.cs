@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore; //DbContext, DbContextOptions, DbSet
+﻿using Microsoft.EntityFrameworkCore; //DbContext, DbContextOptions, DbSet, ModelBuilder
 
 namespace Persistence
 {
