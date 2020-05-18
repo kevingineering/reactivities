@@ -1,14 +1,48 @@
 using System.Collections.Generic; //List
 using System.Linq; //Any
-using Domain; //Activity
+using Domain; //Activity, AppUser
 using System; //DateTime
+using Microsoft.AspNetCore.Identity; //userManager
+using System.Threading.Tasks;
 
 namespace Persistence
 {
   public class Seed
   {
-    public static void SeedData(Persistence.DataContext context)
+    public static async Task SeedData(Persistence.DataContext context, UserManager<AppUser> userManager)
     {
+      //check if users in store
+      if (!userManager.Users.Any())
+      {
+        var users = new List<AppUser>
+        {
+            new AppUser
+            {
+                DisplayName = "Kevin",
+                UserName = "kevin",
+                Email = "kevin@test.com"
+            },
+            new AppUser
+            {
+                DisplayName = "Daniel",
+                UserName = "daniel",
+                Email = "daniel@test.com"
+            },
+            new AppUser
+            {
+                DisplayName = "Paul",
+                UserName = "paul",
+                Email = "paul@test.com"
+            }
+        };
+
+        foreach (var user in users)
+        {
+          //creates in backing store, so don't need to save changes
+          await userManager.CreateAsync(user, "Genesis1:1");
+        }
+      }
+
       //verify there are no activites already in the database
       if (!context.Activities.Any())
       {

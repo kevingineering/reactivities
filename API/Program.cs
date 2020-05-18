@@ -1,5 +1,6 @@
 using System; //Exception
 using Microsoft.AspNetCore.Hosting; //UseStartup
+using Microsoft.AspNetCore.Identity; //UserManager
 using Microsoft.EntityFrameworkCore; //Migrate
 using Microsoft.Extensions.DependencyInjection; //CreateScope
 using Microsoft.Extensions.Hosting;
@@ -25,13 +26,17 @@ namespace API
         try
         {
           var context = services.GetRequiredService<Persistence.DataContext>();
+          
+          //for identity
+          var userManager = services.GetRequiredService<UserManager<Domain.AppUser>>();
 
           //applies pending migrations for the context to the database
           //will create database if it does not exist
           context.Database.Migrate();
 
-          //seed data if no activities in database
-          Persistence.Seed.SeedData(context);
+          //seed data if no activities in database - added userManager for identity
+          //wait function works like await
+          Persistence.Seed.SeedData(context, userManager).Wait();
         }
         catch (Exception ex)
         {
@@ -47,11 +52,12 @@ namespace API
 
     //CreateDefaultBuilder() - sets current directory as API.Startup class, loads configuration for project from appsettings.json, appsettings.<env>.json, and user secrets, and configures logging
     //configureWebHostDefaults() - configures app for Kestrel web server
-    public static Microsoft.Extensions.Hosting.IHostBuilder CreateHostBuilder(string[] args) =>
-      Host.CreateDefaultBuilder(args)
-        .ConfigureWebHostDefaults(webBuilder =>
+    public static IHostBuilder CreateHostBuilder(string[] args)
+    {
+      return Host.CreateDefaultBuilder(args).ConfigureWebHostDefaults(webBuilder =>
         {
           webBuilder.UseStartup<API.Startup>();
         });
+    }
   }
 }

@@ -10,7 +10,7 @@ namespace API.Controllers
   [ApiController]
   public class ValuesController : ControllerBase
   {
-    //database context variable
+    //database context variable - note that to follow clean architecture, context should not be used here but in Application
     private readonly Persistence.DataContext _context;
 
     //constructor
