@@ -5,5 +5,7 @@ obj
 
 #in case we have keys
 appsettings.json
+
 *.db
-notes.txt
+*.txt
+UMLDiagrams

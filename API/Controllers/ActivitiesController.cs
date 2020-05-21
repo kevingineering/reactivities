@@ -15,7 +15,7 @@ namespace API.Controllers
       return await Mediator.Send(new Application.Activities.List.Query());
     }
 
-    [HttpGet("{id}")]
+    [HttpGet("{id}")] //id available as variable
     // [Authorize] - would be required 
     public async Task<ActionResult<Domain.Activity>> Details(Guid id)
     {

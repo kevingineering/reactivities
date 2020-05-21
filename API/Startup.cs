@@ -50,7 +50,9 @@ namespace API
 
       //adding controllers - previously AddMvc - AddController removes functionality we do not need (e.g. razor views)
       //Authorization policy means everything requires authorization unless marked otherwise
-      services.AddControllers(opt => {
+      services.AddControllers(opt =>
+      {
+        //if user is authenticated, they are also authorized - create roles in future?
         var policy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
         opt.Filters.Add(new AuthorizeFilter(policy));
       }).AddFluentValidation(cfg =>
@@ -73,11 +75,11 @@ namespace API
       var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["TokenKey"]));
 
       services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-        .AddJwtBearer(opt => 
+        .AddJwtBearer(opt =>
         {
+          //tell API what to validate when receiving token
           opt.TokenValidationParameters = new TokenValidationParameters
           {
-            //tell API what to validate when receiving token
             ValidateIssuerSigningKey = true, //check signing key first to make sure token originated here
             IssuerSigningKey = key, //key used to create token
             ValidateAudience = false, //could be url it comes from 
@@ -109,17 +111,19 @@ namespace API
       //static files go here
       // app.UseStaticFiles();
 
-      //controls routing
+      //controls routing - adds route matching to the pipeline
       app.UseRouting();
 
       //add CORS
       app.UseCors("CorsPolicy");
 
+      //determining identity of user
       app.UseAuthentication();
 
+      //determining if identified user has access
       app.UseAuthorization();
 
-      //maps controller endpoints into API so API knows what to do when request comes in and gets routed
+      //adds endpoint execution 
       app.UseEndpoints(endpoints =>
       {
         endpoints.MapControllers();

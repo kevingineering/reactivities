@@ -43,7 +43,7 @@ namespace Persistence
         }
       }
 
-      //verify there are no activites already in the database
+      //verify there are no activities already in the database
       if (!context.Activities.Any())
       {
         var activities = new List<Activity>

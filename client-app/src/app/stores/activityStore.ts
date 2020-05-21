@@ -1,16 +1,18 @@
-import { observable, action, computed, configure, runInAction } from 'mobx'
-import { createContext, SyntheticEvent } from 'react'
-import { IActivity } from '../models/Activity'
-import agent from '../api/agent'
-import { history } from '../../index'
+import { observable, action, computed, runInAction } from 'mobx'
+import { SyntheticEvent } from 'react'
 import { toast } from 'react-toastify'
+import { IActivity } from '../models/Activity'
+import agent from '../httpAgent'
+import { history } from '../../index'
+import RootStore from './rootStore'
 
-//ensures you cannot mutate state outside of an action
-configure({ enforceActions: 'always' })
-//async-await schedules new functions that are not covered by an action decorator
-//@action decorator wraps functions with transaction to prevent state issues
+export default class ActivityStore {
+  //create rootstore property and add include in constructor - used to add ActivityStore to root
+  rootStore: RootStore
+  constructor(rootStore: RootStore) {
+    this.rootStore = rootStore
+  }
 
-class ActivityStore {
   //dynamic keyed observable map - list of activities from database
   @observable activityRegistry = new Map()
   //single activity set when 'View' button is clicked
@@ -71,6 +73,7 @@ class ActivityStore {
     try {
       this.loadingInitial = true
       const activities = await agent.Activities.list()
+      //runInAction is required anytime we have an async operation, anything after that is seen as a new expression
       runInAction('load activities', () => {
         activities.forEach((activity) => {
           activity.date = new Date(activity.date)
@@ -82,7 +85,6 @@ class ActivityStore {
     } catch (error) {
       runInAction('load activities error', () => {
         this.loadingInitial = false
-        console.log(error)
       })
     }
   }
@@ -106,7 +108,6 @@ class ActivityStore {
       } catch (error) {
         runInAction('load activity error', () => {
           this.loadingInitial = false
-          console.log(error)
         })
       }
     }
@@ -130,7 +131,6 @@ class ActivityStore {
     } catch (error) {
       runInAction('create activity error', () => {
         this.submitting = false
-        console.log(error.response)
         toast.error(error.response.data.title)
       })
     }
@@ -150,7 +150,6 @@ class ActivityStore {
       runInAction('edit activity error', () => {
         this.submitting = false
         toast.error(error.response.title)
-
       })
     }
   }
@@ -171,7 +170,6 @@ class ActivityStore {
     } catch (error) {
       runInAction('delete activity error', () => {
         this.submitting = false
-        console.log(error)
         this.target = ''
       })
     }
@@ -181,5 +179,3 @@ class ActivityStore {
     this.currentActivity = null
   }
 }
-
-export default createContext(new ActivityStore())

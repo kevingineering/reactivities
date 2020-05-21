@@ -4,7 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace API.Controllers
 {
-  //attribute based routing - api/values - 'values' comes from name 'ValuesController'
+  //attribute based routing - api/controllername
   //ApiController automatically removes bad requests
   //ApiController also provides binding source parameter inference
   [Route("api/[controller]")]
