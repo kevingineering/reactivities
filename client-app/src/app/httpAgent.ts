@@ -10,7 +10,7 @@ import { IActivity } from './models/Activity'
 //base path - every call will start with this url
 axios.defaults.baseURL = 'http://localhost:5000/api'
 
-//for every response, catch erros if they exist
+//for every response, catch errors if they exist
 //takes two parameters - what to do when response is fulfilled, what to do when response is rejected
 axios.interceptors.response.use(undefined, (error) => {
   if (error.message === 'Network Error' && !error.response) {

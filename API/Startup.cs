@@ -12,6 +12,7 @@ using Microsoft.Extensions.Configuration; //GetConnectionString, IConfiguration
 using Microsoft.Extensions.DependencyInjection; //IServiceCollection, AddDbContext, AddControlers
 using Microsoft.Extensions.Hosting; //env
 using Microsoft.IdentityModel.Tokens; //TokenValidationParameters
+using AutoMapper;
 
 namespace API
 {
@@ -30,9 +31,15 @@ namespace API
     //dependency injection container
     public void ConfigureServices(IServiceCollection services)
     {
+      //AddTransient - alwayts different, a new instance is provided to every controller and every service
+      //AddScoped - same within a request, but different across different requests
+      //AddSingleton - same for every object and every request
+
+
       //UseSqlite takes connection string from configuration files
       services.AddDbContext<Persistence.DataContext>(opt =>
       {
+        opt.UseLazyLoadingProxies();
         opt.UseSqlite(Configuration.GetConnectionString("DefaultConnection"));
       });
 
@@ -47,6 +54,9 @@ namespace API
 
       //add mediatr - takes assembly, have to tell it about at least one class in assembly
       services.AddMediatR(typeof(Application.Activities.List.Handler).Assembly);
+
+      //tell assembly to go and look for mapping profiles 
+      services.AddAutoMapper(typeof (Application.Activities.List.Handler));
 
       //adding controllers - previously AddMvc - AddController removes functionality we do not need (e.g. razor views)
       //Authorization policy means everything requires authorization unless marked otherwise
@@ -70,6 +80,18 @@ namespace API
       identityBuilder.AddEntityFrameworkStores<Persistence.DataContext>();
       //add SignInManger type and AppUser
       identityBuilder.AddSignInManager<SignInManager<Domain.AppUser>>();
+
+      //adds authorization policy to check if user is host of activity
+      services.AddAuthorization(opt => 
+      {
+        opt.AddPolicy("IsActivityHost", policy => 
+        {
+          policy.Requirements.Add(new Infrastructure.Security.IsHostRequirement());
+        });
+      });
+
+      //
+      services.AddTransient<IAuthorizationHandler, Infrastructure.Security.IsHostRequirementHandler>();
 
       //key here same as in JwtGenerator
       var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["TokenKey"]));

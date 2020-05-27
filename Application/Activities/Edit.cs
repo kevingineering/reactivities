@@ -53,7 +53,7 @@ namespace Application.Activities
 
         //throw custom exception if activity is not found
         if (activity == null)
-          throw new Application.Errors.RestException(HttpStatusCode.NotFound, new { activity = "Not found." });
+          throw new Application.Errors.RestException(HttpStatusCode.NotFound, new { activity = "Activity not found." });
 
         //?? is null coalescing operator
         activity.Title = request.Title ?? activity.Title;

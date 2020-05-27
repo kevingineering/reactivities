@@ -1,4 +1,5 @@
 using System; //Guid, DateTime
+using System.Collections.Generic;
 
 namespace Domain
 {
@@ -18,5 +19,9 @@ namespace Domain
     public string City { get; set; }
 
     public string Venue { get; set; }
+
+    //defines relationship between AppUser and UserActivity
+    //virtual keyword is required for lazy loading
+    public virtual ICollection<UserActivity> UserActivities { get; set; }
   }
 }

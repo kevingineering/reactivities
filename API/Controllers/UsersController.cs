@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Authorization; //AllowAnonymous, Authorize
 
 namespace API.Controllers
 {
-  public class UsersController : BaseController
+  public class UserController : BaseController
   {
     [AllowAnonymous]
     [HttpPost("login")]

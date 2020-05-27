@@ -14,8 +14,9 @@ namespace Persistence
     }
 
     //entity we are using - Activities is table name in SQL
-    //AppUser is not required as DbSet because it is passed in at the class level
     public DbSet<Domain.Activity> Activities { get; set; }
+    //AppUser is not required as DbSet because it is passed in at the class level
+    public DbSet<Domain.UserActivity> UserActivities { get; set; }
 
     //adding data to database when migration is created
     protected override void OnModelCreating(ModelBuilder builder)
@@ -27,6 +28,22 @@ namespace Persistence
       // builder.Entity<Domain.Activity>().HasData(
       //   new Domain.Activity { ... },
       // );
+
+      //configure UserActivity
+
+      //define primary key (here composite key)
+      builder.Entity<Domain.UserActivity>(x => x.HasKey(ua => new { ua.AppUserId, ua.ActivityId }));
+      //define first half of relationship - one user can have many activities
+      builder.Entity<Domain.UserActivity>()
+        .HasOne(u => u.AppUser)
+        .WithMany(ua => ua.UserActivities)
+        .HasForeignKey(u => u.AppUserId);
+      //define second half of relationship - one activity can have many users
+      builder.Entity<Domain.UserActivity>()
+        .HasOne(a => a.Activity)
+        .WithMany(ua => ua.UserActivities)
+        .HasForeignKey(a => a.ActivityId);
+
     }
   }
 }
