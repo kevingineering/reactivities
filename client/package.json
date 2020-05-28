@@ -1,5 +1,5 @@
 {
-  "name": "client-app",
+  "name": "client",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -16,12 +16,12 @@
     "@types/revalidate": "^1.1.2",
     "axios": "^0.19.2",
     "date-fns": "^2.0.0-alpha.13",
-    "final-form": "^4.19.1",
+    "final-form": "^4.20.0",
     "mobx": "^5.15.4",
     "mobx-react-lite": "^1.5.2",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
-    "react-final-form": "^6.4.0",
+    "react-final-form": "^6.5.0",
     "react-router-dom": "^5.1.2",
     "react-scripts": "3.4.1",
     "react-toastify": "^5.5.0",

@@ -5,6 +5,7 @@ import { IActivity } from '../models/Activity'
 import agent from '../httpAgent'
 import { history } from '../../index'
 import RootStore from './rootStore'
+import { setActivityProps, createAttendee } from '../utilityFunctions/util'
 
 export default class ActivityStore {
   //create rootstore property and add include in constructor - used to add ActivityStore to root
@@ -23,6 +24,8 @@ export default class ActivityStore {
   @observable submitting = false
   //target determines which button has been clicked
   @observable target = ''
+  //general loading, used for attend/unattend
+  @observable loading = false
 
   //sorts activities by date
   @computed get activitiesByDate() {
@@ -76,7 +79,7 @@ export default class ActivityStore {
       //runInAction is required anytime we have an async operation, anything after that is seen as a new expression
       runInAction('load activities', () => {
         activities.forEach((activity) => {
-          activity.date = new Date(activity.date)
+          activity = setActivityProps(activity, this.rootStore.userStore.user!)
           this.activityRegistry.set(activity.id, activity)
         })
         this.loadingInitial = false
@@ -99,7 +102,7 @@ export default class ActivityStore {
         this.loadingInitial = true
         activity = await agent.Activities.details(id)
         runInAction('load activity', () => {
-          activity.date = new Date(activity.date)
+          activity = setActivityProps(activity, this.rootStore.userStore.user!)
           this.currentActivity = activity
           this.activityRegistry.set(activity.id, activity)
           this.loadingInitial = false
@@ -123,6 +126,12 @@ export default class ActivityStore {
     try {
       this.submitting = true
       await agent.Activities.create(activity)
+      const attendee = createAttendee(this.rootStore.userStore.user!)
+      attendee.isHost = true
+      let attendees = [attendee]
+      activity.attendees = attendees
+      activity.isHost = true
+      activity.isGoing = true
       runInAction('create activity', () => {
         this.activityRegistry.set(activity.id, activity)
         this.submitting = false
@@ -171,6 +180,51 @@ export default class ActivityStore {
       runInAction('delete activity error', () => {
         this.submitting = false
         this.target = ''
+      })
+    }
+  }
+
+  @action attendActivity = async () => {
+    try {
+      this.loading = true
+      await agent.Activities.attend(this.currentActivity!.id)
+      runInAction('attend activity', () => {
+        //create attendee, push to activity attendees array, set is going to true, and update activity registry
+        const attendee = createAttendee(this.rootStore.userStore.user!)
+        if (this.currentActivity) {
+          this.currentActivity.attendees.push(attendee)
+          this.currentActivity.isGoing = true
+          this.activityRegistry.set(this.currentActivity.id, this.currentActivity)
+          this.loading = false
+        }
+      })
+    } catch (error) {
+      runInAction('attend activity error', () => {
+        this.loading = false
+      })
+      toast.error('Problem signing up for activity.')
+    }
+  }
+
+  @action unattendActivity = async () => {
+    try {
+      this.loading = true
+      await agent.Activities.unattend(this.currentActivity!.id)
+      runInAction('unattend activity', () => {
+        //remove attendee, remove from activity attendees array, set is going to false, and update activity registry
+        if (this.currentActivity) {
+          this.currentActivity.attendees = this.currentActivity.attendees.filter(
+            (a) => a.username !== this.rootStore.userStore.user?.username
+          )
+          this.currentActivity.isGoing = false
+          this.activityRegistry.set(this.currentActivity.id, this.currentActivity)
+          this.loading = false
+        }
+      })
+    } catch (error) {
+      runInAction('unattend activity error', () => {
+        this.loading = false
+        toast.error('Problem cancelling attendance.')
       })
     }
   }

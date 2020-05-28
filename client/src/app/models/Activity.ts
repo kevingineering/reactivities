@@ -10,6 +10,9 @@ export interface IActivity {
   date: Date
   city: string
   venue: string
+  isGoing: boolean
+  isHost: boolean
+  attendees: IAttendee[]
 }
 
 //extends IActivity but makes all properties optional
@@ -35,6 +38,12 @@ export class ActivityFormValues implements IActivityFormValues {
     if (init && init.date) {
       this.time = init.date
     }
-
   }
+}
+
+export interface IAttendee {
+  username: string
+  displayName: string
+  image: string | null
+  isHost: boolean
 }

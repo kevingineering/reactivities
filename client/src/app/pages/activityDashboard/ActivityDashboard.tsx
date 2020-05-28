@@ -1,9 +1,9 @@
 import React, { useEffect, useContext } from 'react'
 import { Grid } from 'semantic-ui-react'
 import { observer } from 'mobx-react-lite'
-import ActivityList from './activitySupport/ActivityList'
-import { RootStoreContext } from '../stores/rootStore'
-import LoadingComponent from '../sharedComponents/LoadingComponent'
+import ActivityList from '../activityDashboard/ActivityList'
+import { RootStoreContext } from '../../stores/rootStore'
+import LoadingComponent from '../../sharedComponents/LoadingComponent'
 
 const ActivityDashboard: React.FC = () => {
   const rootStore = useContext(RootStoreContext)

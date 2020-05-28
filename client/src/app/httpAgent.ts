@@ -80,16 +80,18 @@ const Activities = {
   edit: (activity: IActivity) =>
     requests.put(`/activities/${activity.id}`, activity),
   delete: (id: string) => requests.del(`/activities/${id}`),
+  attend: (id: string) => requests.post(`/activities/attend/${id}`, {}),
+  unattend: (id: string) => requests.del(`/activities/attend/${id}`)
 }
 
-//users requests
+//user requests
 // methodName: (paramName?: paramType?): returnType => requests.method('/pathAddedToBaseURL', body?)
 const Users = {
-  currentUser: (): Promise<IUser> => requests.get('/users'),
+  currentUser: (): Promise<IUser> => requests.get('/user'),
   login: (user: IUserFormValues): Promise<IUser> =>
-    requests.post('/users/login', user),
+    requests.post('/user/login', user),
   register: (user: IUserFormValues): Promise<IUser> =>
-    requests.post('/users/register', user),
+    requests.post('/user/register', user),
 }
 
 export default {
