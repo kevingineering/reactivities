@@ -112,6 +112,9 @@ namespace API
       //custom services
       services.AddScoped<Application.Interfaces.IJwtGenerator, Infrastructure.Security.JwtGenerator>();
       services.AddScoped<Application.Interfaces.IUserAccessor, Infrastructure.Security.UserAccessor>();
+      services.AddScoped<Application.Interfaces.IPhotoAccessor, Infrastructure.Photos.PhotoAccessor>();
+      //configuration has access to dotnet user secrets, settings are strongly typed to the values contained in user secrets
+      services.Configure<Infrastructure.Photos.CloudinarySettings>(Configuration.GetSection("Cloudinary"));
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

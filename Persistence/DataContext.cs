@@ -18,6 +18,8 @@ namespace Persistence
     //AppUser is not required as DbSet because it is passed in at the class level
     public DbSet<Domain.UserActivity> UserActivities { get; set; }
 
+    public DbSet<Domain.Photo> Photos { get; set; }
+
     //adding data to database when migration is created
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -43,7 +45,6 @@ namespace Persistence
         .HasOne(a => a.Activity)
         .WithMany(ua => ua.UserActivities)
         .HasForeignKey(a => a.ActivityId);
-
     }
   }
 }

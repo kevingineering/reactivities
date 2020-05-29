@@ -20,7 +20,7 @@ namespace API.Controllers
     // [Authorize] - would be required 
     public async Task<ActionResult<Application.Activities.ActivityDTO>> Details(Guid id)
     {
-      return await Mediator.Send(new Application.Activities.Details.Query{Id = id});
+      return await Mediator.Send(new Application.Activities.Details.Query {Id = id});
     }
 
     [HttpPost]
@@ -48,7 +48,7 @@ namespace API.Controllers
     [Authorize(Policy = "IsActivityHost")]
     public async Task<ActionResult<Unit>> Delete(Guid id)
     {
-      return await Mediator.Send(new Application.Activities.Delete.Command{Id = id});
+      return await Mediator.Send(new Application.Activities.Delete.Command {Id = id});
     }
 
     [HttpDelete("attend/{id}")]

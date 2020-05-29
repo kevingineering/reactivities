@@ -6,10 +6,11 @@ namespace Domain
   //note we are introducing dependency at domain layer
   public class AppUser : IdentityUser
   {
-    //name displayed in app for user
     public string DisplayName { get; set; }
+    public string Bio { get; set; }
 
-    //defines relationship between AppUser and UserActivity
+    //relationships
     public virtual ICollection<UserActivity> UserActivities { get; set; }
+    public virtual ICollection<Photo> Photos { get; set; }
   }
 }
