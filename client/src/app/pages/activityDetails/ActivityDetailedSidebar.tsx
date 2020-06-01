@@ -12,7 +12,7 @@ const ActivityDetailedSidebar: React.FC<IProps> = ({ attendees }) => {
   const count = attendees.length
 
   const attendeeList = attendees.map((a) => (
-    <Item style={{ position: 'relative' }} key={a.username}>
+    <Item style={{ position: 'relative' }} key={a.userName}>
       {a.isHost && (
         <Label style={{ position: 'absolute' }} color="orange" ribbon="right">
           Host
@@ -21,7 +21,7 @@ const ActivityDetailedSidebar: React.FC<IProps> = ({ attendees }) => {
       <Image size="tiny" src={a.image || '/assets/user.png'} />
       <Item.Content verticalAlign="middle">
         <Item.Header as="h3">
-          <Link to={`/profile/${a.username}`}>{a.displayName}</Link>
+          <Link to={`/profile/${a.userName}`}>{a.displayName}</Link>
         </Item.Header>
         <Item.Extra style={{ color: 'orange' }}>Following</Item.Extra>
       </Item.Content>

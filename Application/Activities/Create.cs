@@ -65,7 +65,7 @@ namespace Application.Activities
         _context.Add(activity);
 
         //get user from DB
-        var user = await _context.Users.SingleOrDefaultAsync(x => x.UserName == _userAccessor.GetCurrentUsername());
+        var user = await _context.Users.SingleOrDefaultAsync(x => x.UserName == _userAccessor.GetCurrentUserName());
 
         //create attendee - notice AppUserId and ActivityId are not required 
         var attendee = new Domain.UserActivity {

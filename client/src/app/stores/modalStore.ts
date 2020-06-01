@@ -11,17 +11,17 @@ export default class ModalStore {
   //observable objects are observed as deep by default, here we want it shallow
 
   @observable.shallow modal = {
-    open: false,
+    isOpen: false,
     body: null
   }
 
   @action openModal = (content: any) => {
-    this.modal.open = true
+    this.modal.isOpen = true
     this.modal.body = content
   }
 
   @action closeModal = () => {
-    this.modal.open = false
+    this.modal.isOpen = false
     this.modal.body = null
   }
 }

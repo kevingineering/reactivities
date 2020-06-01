@@ -19,13 +19,13 @@ export default class ActivityStore {
   //single activity set when 'View' button is clicked
   @observable currentActivity: IActivity | null = null
   //used when page first loads
-  @observable loadingInitial = false
+  @observable isLoadingInitial = false
   //used when 'Submit' button is clicked on activity form
-  @observable submitting = false
+  @observable isSubmitting = false
   //target determines which button has been clicked
   @observable target = ''
   //general loading, used for attend/unattend
-  @observable loading = false
+  @observable isLoading = false
 
   //sorts activities by date
   @computed get activitiesByDate() {
@@ -74,7 +74,7 @@ export default class ActivityStore {
 
   @action loadActivities = async () => {
     try {
-      this.loadingInitial = true
+      this.isLoadingInitial = true
       const activities = await agent.Activities.list()
       //runInAction is required anytime we have an async operation, anything after that is seen as a new expression
       runInAction('load activities', () => {
@@ -82,12 +82,12 @@ export default class ActivityStore {
           activity = setActivityProps(activity, this.rootStore.userStore.user!)
           this.activityRegistry.set(activity.id, activity)
         })
-        this.loadingInitial = false
+        this.isLoadingInitial = false
       })
       // console.log(this.groupActivitiesByDate(activities))
     } catch (error) {
       runInAction('load activities error', () => {
-        this.loadingInitial = false
+        this.isLoadingInitial = false
       })
     }
   }
@@ -99,18 +99,18 @@ export default class ActivityStore {
       return activity
     } else {
       try {
-        this.loadingInitial = true
+        this.isLoadingInitial = true
         activity = await agent.Activities.details(id)
         runInAction('load activity', () => {
           activity = setActivityProps(activity, this.rootStore.userStore.user!)
           this.currentActivity = activity
           this.activityRegistry.set(activity.id, activity)
-          this.loadingInitial = false
+          this.isLoadingInitial = false
         })
         return activity
       } catch (error) {
         runInAction('load activity error', () => {
-          this.loadingInitial = false
+          this.isLoadingInitial = false
         })
       }
     }
@@ -124,7 +124,7 @@ export default class ActivityStore {
 
   @action createActivity = async (activity: IActivity) => {
     try {
-      this.submitting = true
+      this.isSubmitting = true
       await agent.Activities.create(activity)
       const attendee = createAttendee(this.rootStore.userStore.user!)
       attendee.isHost = true
@@ -134,12 +134,12 @@ export default class ActivityStore {
       activity.isGoing = true
       runInAction('create activity', () => {
         this.activityRegistry.set(activity.id, activity)
-        this.submitting = false
+        this.isSubmitting = false
       })
       history.push(`/activities/${activity.id}`)
     } catch (error) {
       runInAction('create activity error', () => {
-        this.submitting = false
+        this.isSubmitting = false
         toast.error(error.response.data.title)
       })
     }
@@ -147,17 +147,17 @@ export default class ActivityStore {
 
   @action editActivity = async (activity: IActivity) => {
     try {
-      this.submitting = true
+      this.isSubmitting = true
       await agent.Activities.edit(activity)
       runInAction('edit activity', () => {
         this.activityRegistry.set(activity.id, activity)
         this.currentActivity = activity
-        this.submitting = false
+        this.isSubmitting = false
       })
       history.push(`/activities/${activity.id}`)
     } catch (error) {
       runInAction('edit activity error', () => {
-        this.submitting = false
+        this.isSubmitting = false
         toast.error(error.response.title)
       })
     }
@@ -168,17 +168,17 @@ export default class ActivityStore {
     id: string
   ) => {
     try {
-      this.submitting = true
+      this.isSubmitting = true
       this.target = e.currentTarget.name
       await agent.Activities.delete(id)
       runInAction('delete activity', () => {
         this.activityRegistry.delete(id)
-        this.submitting = false
+        this.isSubmitting = false
         this.target = ''
       })
     } catch (error) {
       runInAction('delete activity error', () => {
-        this.submitting = false
+        this.isSubmitting = false
         this.target = ''
       })
     }
@@ -186,7 +186,7 @@ export default class ActivityStore {
 
   @action attendActivity = async () => {
     try {
-      this.loading = true
+      this.isLoading = true
       await agent.Activities.attend(this.currentActivity!.id)
       runInAction('attend activity', () => {
         //create attendee, push to activity attendees array, set is going to true, and update activity registry
@@ -195,12 +195,12 @@ export default class ActivityStore {
           this.currentActivity.attendees.push(attendee)
           this.currentActivity.isGoing = true
           this.activityRegistry.set(this.currentActivity.id, this.currentActivity)
-          this.loading = false
+          this.isLoading = false
         }
       })
     } catch (error) {
       runInAction('attend activity error', () => {
-        this.loading = false
+        this.isLoading = false
       })
       toast.error('Problem signing up for activity.')
     }
@@ -208,22 +208,22 @@ export default class ActivityStore {
 
   @action unattendActivity = async () => {
     try {
-      this.loading = true
+      this.isLoading = true
       await agent.Activities.unattend(this.currentActivity!.id)
       runInAction('unattend activity', () => {
         //remove attendee, remove from activity attendees array, set is going to false, and update activity registry
         if (this.currentActivity) {
           this.currentActivity.attendees = this.currentActivity.attendees.filter(
-            (a) => a.username !== this.rootStore.userStore.user?.username
+            (a) => a.userName !== this.rootStore.userStore.user?.userName
           )
           this.currentActivity.isGoing = false
           this.activityRegistry.set(this.currentActivity.id, this.currentActivity)
-          this.loading = false
+          this.isLoading = false
         }
       })
     } catch (error) {
       runInAction('unattend activity error', () => {
-        this.loading = false
+        this.isLoading = false
         toast.error('Problem cancelling attendance.')
       })
     }

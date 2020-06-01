@@ -9,7 +9,7 @@ import ErrorMessage from '../sharedComponents/formComponents/ErrorMessage'
 import TextInput from '../sharedComponents/formComponents/TextInput'
 
 const validate = combineValidators({
-  username: isRequired('Username'),
+  userName: isRequired('Username'),
   displayName: isRequired('Display Name'),
   email: isRequired('Email'),
   password: isRequired('Password'),
@@ -48,7 +48,7 @@ const Register = () => {
             color="teal"
             textAlign="center"
           />
-          <Field placeholder="Username" name="username" component={TextInput} />
+          <Field placeholder="Username" name="userName" component={TextInput} />
           <Field
             placeholder="Display Name"
             name="displayName"

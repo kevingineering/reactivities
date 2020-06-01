@@ -13,15 +13,15 @@ import Navbar from './pages/general/Navbar'
 import ActivityDashboard from './pages/activityDashboard/ActivityDashboard'
 import ActivityDetails from './pages/activityDetails/ActivityDetails'
 import ActivityCreate from './pages/ActivityCreate'
-import Login from './pages/Login'
 import NotFound from './pages/NotFound'
 import { RootStoreContext } from './stores/rootStore'
 import LoadingComponent from './sharedComponents/LoadingComponent'
 import ModalContainer from './sharedComponents/ModalContainer'
+import ProfilePage from './pages/profile/ProfilePage'
 
 const App: React.FC<RouteComponentProps> = (props) => {
   const rootStore = useContext(RootStoreContext)
-  const { appLoaded, setAppLoaded, token } = rootStore.commonStore
+  const { isAppLoaded, setAppLoaded, token } = rootStore.commonStore
   const { getUser } = rootStore.userStore
 
   //check if token is in store
@@ -33,15 +33,14 @@ const App: React.FC<RouteComponentProps> = (props) => {
     }
   }, [getUser, setAppLoaded, token])
 
-  if (!appLoaded) 
-  {
-    return <LoadingComponent content='Loading app...'/>
+  if (!isAppLoaded) {
+    return <LoadingComponent content="Loading app..." />
   }
 
   return (
     <React.Fragment>
       <ModalContainer />
-      <ToastContainer position='bottom-right'/>
+      <ToastContainer position="bottom-right" />
       <Route exact path="/" component={HomePage} />
       {/* '/(.+)' means a path with anything beyond '/' */}
       <Route
@@ -51,23 +50,18 @@ const App: React.FC<RouteComponentProps> = (props) => {
             <Navbar />
             <Container style={{ marginTop: '7em' }}>
               <Switch>
-                <Route 
-                  exact path="/activities" 
-                  component={ActivityDashboard} 
-                />
-                <Route 
-                  path="/activities/:id" 
-                  component={ActivityDetails} 
-                />
+                <Route exact path="/activities" component={ActivityDashboard} />
+                <Route path="/activities/:id" component={ActivityDetails} />
                 {/* Note that you can pass an array for your route. Note also that we are using a key. A key forces a component to rerender even if nothing appears to have changed. Our key here is dependent on props. To get props, we need to use the HOC withRouter. All this allows us to update the form on the createActivity page so that it is empty when a user clicks the createActivity button after rerouting there from the /manage/:id page */}
                 <Route
                   path={['/createActivity', '/manage/:id']}
                   component={ActivityCreate}
                   key={props.location.key}
                 />
-                <Route 
-                  exact path="/login" 
-                  component={Login} 
+                <Route
+                  exact
+                  path="/profile/:userName"
+                  component={ProfilePage}
                 />
                 <Route component={NotFound} />
               </Switch>

@@ -21,7 +21,7 @@ export default class CommonStore {
   }
 
   @observable token: string | null = window.localStorage.getItem('jwt')
-  @observable appLoaded: boolean = false
+  @observable isAppLoaded: boolean = false
 
   //add token to local storage
   @action setToken = (token: string | null) => {
@@ -29,6 +29,6 @@ export default class CommonStore {
   }
 
   @action setAppLoaded = () => {
-    this.appLoaded = true
+    this.isAppLoaded = true
   }
 }

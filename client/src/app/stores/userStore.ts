@@ -11,7 +11,6 @@ export default class UserStore {
     this.rootStore = rootStore
   }
 
-  //username, displayName, token, image
   @observable user: IUser | null = null
 
   @computed get isLoggedIn() {

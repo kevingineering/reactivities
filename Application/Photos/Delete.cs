@@ -31,7 +31,7 @@ namespace Application.Photos
       public async Task<Unit> Handle(Command request, CancellationToken cancellationToken)
       {
         //get user
-        var user = await _context.Users.SingleOrDefaultAsync(x => x.UserName == _userAccessor.GetCurrentUsername());
+        var user = await _context.Users.SingleOrDefaultAsync(x => x.UserName == _userAccessor.GetCurrentUserName());
 
         //get photo from user photos
         var photo = user.Photos.FirstOrDefault(x => x.Id == request.Id);

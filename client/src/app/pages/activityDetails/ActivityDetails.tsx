@@ -20,7 +20,7 @@ const ActivityDetails: React.FC<RouteComponentProps<DetailParams>> = (
   const {
     currentActivity,
     loadActivity,
-    loadingInitial,
+    isLoadingInitial,
   } = rootStore.activityStore
 
   useEffect(() => {
@@ -28,7 +28,7 @@ const ActivityDetails: React.FC<RouteComponentProps<DetailParams>> = (
     //eslint-disable-next-line
   }, [])
 
-  if (loadingInitial) return <LoadingComponent content="Loading activity..." />
+  if (isLoadingInitial) return <LoadingComponent content="Loading activity..." />
 
   if (!currentActivity) return <h2>Not Found</h2>
 

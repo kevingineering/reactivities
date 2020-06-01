@@ -34,7 +34,7 @@ namespace Application.Activities
         }
 
         //get user - can't be null because token is required
-        var user = await _context.Users.SingleOrDefaultAsync(x => x.UserName == _userAccessor.GetCurrentUsername());
+        var user = await _context.Users.SingleOrDefaultAsync(x => x.UserName == _userAccessor.GetCurrentUserName());
 
         //see if attendance already exists 
         var attendance = await _context.UserActivities

@@ -16,7 +16,7 @@ namespace Application.User
     public class Command : IRequest<UserDTO>
     {
       public string DisplayName { get; set; }
-      public string Username { get; set; }
+      public string UserName { get; set; }
       public string Email { get; set; }
       public string Password { get; set; }
     }
@@ -26,7 +26,7 @@ namespace Application.User
       public QueryValidator()
       {
         RuleFor(x => x.DisplayName).NotEmpty();
-        RuleFor(x => x.Username).NotEmpty();
+        RuleFor(x => x.UserName).NotEmpty();
         RuleFor(x => x.Email).NotEmpty().EmailAddress();
         RuleFor(x => x.Password).Password(); //custom validator
       }
@@ -57,14 +57,14 @@ namespace Application.User
         if (await _context.Users.Where(x => x.Email == request.Email).AnyAsync())
           throw new Application.Errors.RestException(HttpStatusCode.BadRequest, new { Email = "Email already exists." });
 
-        if (await _context.Users.Where(x => x.UserName == request.Username).AnyAsync())
-          throw new Application.Errors.RestException(HttpStatusCode.BadRequest, new { Username = "Username already exists." });
+        if (await _context.Users.Where(x => x.UserName == request.UserName).AnyAsync())
+          throw new Application.Errors.RestException(HttpStatusCode.BadRequest, new { UserName = "Username already exists." });
         
         //create new user
         var user = new Domain.AppUser
         {
           DisplayName = request.DisplayName,
-          UserName = request.Username,
+          UserName = request.UserName,
           Email = request.Email
         };
 
@@ -77,7 +77,7 @@ namespace Application.User
           {
             DisplayName = user.DisplayName,
             Token = _jwtGenerator.CreateToken(user),
-            Username = user.UserName,
+            UserName = user.UserName,
             Image = user.Photos.FirstOrDefault(x => x.IsMain)?.Url
           };
         }

@@ -28,7 +28,7 @@ namespace Infrastructure.Security
     protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, IsHostRequirement requirement)
     {
       //get username from httpcontext
-      var currentUsername = _httpContextAccessor.HttpContext.User?.Claims?.SingleOrDefault(x => x.Type == ClaimTypes.NameIdentifier)?.Value;
+      var currentUserName = _httpContextAccessor.HttpContext.User?.Claims?.SingleOrDefault(x => x.Type == ClaimTypes.NameIdentifier)?.Value;
 
       //Id stored as Guid in database but passed as string in route params
       //RouteValues are key-value pairs, we will have "id" key, single or default gets pair and we then get value
@@ -38,7 +38,7 @@ namespace Infrastructure.Security
 
       var host = activity.UserActivities.FirstOrDefault(x => x.IsHost);
 
-      if (host?.AppUser?.UserName == currentUsername)
+      if (host?.AppUser?.UserName == currentUserName)
       {
         context.Succeed(requirement);
       }

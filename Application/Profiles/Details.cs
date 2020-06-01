@@ -11,7 +11,7 @@ namespace Application.Profiles
   {
     public class Query : IRequest<Profile>
     {
-      public string Username { get; set; }
+      public string UserName { get; set; }
     }
 
     public class Handler : IRequestHandler<Query, Profile>
@@ -25,7 +25,7 @@ namespace Application.Profiles
       public async Task<Profile> Handle(Query request, CancellationToken cancellationToken)
       {
         //get user
-        var user = await _context.Users.SingleOrDefaultAsync(x => x.UserName == request.Username);
+        var user = await _context.Users.SingleOrDefaultAsync(x => x.UserName == request.UserName);
 
         //verify user exists
         if (user == null)

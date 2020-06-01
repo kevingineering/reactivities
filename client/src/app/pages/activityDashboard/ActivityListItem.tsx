@@ -10,16 +10,26 @@ interface IProps {
 }
 
 const ActivityListItem: React.FC<IProps> = ({ activity }) => {
-  const host = activity.attendees.filter(a => a.isHost)[0]
+  const host = activity.attendees.filter((a) => a.isHost)[0]
   return (
     <Segment.Group>
       <Segment>
         <Item.Group>
           <Item>
-            <Item.Image size="tiny" circular src={host.image || "/assets/user.png"} />
+            <Item.Image
+              size="tiny"
+              circular
+              src={host.image || '/assets/user.png'}
+              style={{ marginBottom: 5 }} //keeps picture round
+            />
             <Item.Content>
-              <Item.Header as={Link} to={`activities/${activity.id}`}>{activity.title}</Item.Header>
-              <Item.Description>Hosted by {host.displayName}</Item.Description>
+              <Item.Header as={Link} to={`activities/${activity.id}`}>
+                {activity.title}
+              </Item.Header>
+              <Item.Description>
+                Hosted by
+                <Link to={`/profile/${host.userName}`}> {host.displayName}</Link>
+              </Item.Description>
               {activity.isHost && (
                 <Item.Description>
                   <Label

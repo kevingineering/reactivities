@@ -44,19 +44,19 @@ const ActivityCreate: React.FC<RouteComponentProps<DetailParams>> = (props) => {
     createActivity,
     editActivity,
     loadActivity,
-    submitting,
+    isSubmitting,
   } = rootStore.activityStore
 
   const [activity, setActivity] = useState(new ActivityFormValues())
-  const [loading, setLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
     if (props.match.params.id) {
-      setLoading(true)
+      setIsLoading(true)
       loadActivity(props.match.params.id)
         .then((a) => setActivity(new ActivityFormValues(a)))
         .finally(() => {
-          setLoading(false)
+          setIsLoading(false)
         })
     }
     //eslint-disable-next-line
@@ -85,7 +85,7 @@ const ActivityCreate: React.FC<RouteComponentProps<DetailParams>> = (props) => {
             // invalid is bool that checks if any fields are invalid
             // pristine is bool that checks if nothing has changed
             render={({ handleSubmit, invalid, pristine }) => (
-              <Form onSubmit={handleSubmit} loading={loading}>
+              <Form onSubmit={handleSubmit} loading={isLoading}>
                 <Field
                   placeholder="Title"
                   name="title"
@@ -140,8 +140,8 @@ const ActivityCreate: React.FC<RouteComponentProps<DetailParams>> = (props) => {
                   positive
                   type="submit"
                   content="Submit"
-                  loading={submitting}
-                  disabled={loading || invalid || pristine}
+                  loading={isSubmitting}
+                  disabled={isLoading || invalid || pristine}
                 />
                 <Button
                   floated="right"
@@ -152,7 +152,7 @@ const ActivityCreate: React.FC<RouteComponentProps<DetailParams>> = (props) => {
                       props.history.push(`/activities/${activity.id}`)
                     else props.history.push('/activities')
                   }}
-                  disabled={loading}
+                  disabled={isLoading}
                 />
               </Form>
             )}

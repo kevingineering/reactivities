@@ -34,7 +34,7 @@ namespace Application.Photos
         var photoUploadResult = _photoAccessor.AddPhoto(request.File);
 
         //get user
-        var user = await _context.Users.SingleOrDefaultAsync(x => x.UserName == _userAccessor.GetCurrentUsername());
+        var user = await _context.Users.SingleOrDefaultAsync(x => x.UserName == _userAccessor.GetCurrentUserName());
 
         //create photo
         var photo = new Domain.Photo {

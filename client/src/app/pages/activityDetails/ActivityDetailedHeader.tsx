@@ -25,7 +25,7 @@ interface IProps {
 
 const ActivityDetailedHeader: React.FC<IProps> = ({ activity }) => {
   const rootStore = useContext(RootStoreContext)
-  const { attendActivity, unattendActivity, loading } = rootStore.activityStore
+  const { attendActivity, unattendActivity, isLoading } = rootStore.activityStore
 
   const host = activity.attendees.filter((a) => a.isHost)[0]
 
@@ -48,7 +48,7 @@ const ActivityDetailedHeader: React.FC<IProps> = ({ activity }) => {
                 />
                 <p>{format(activity.date, 'eeee MMMM do')}</p>
                 <p>
-                  Hosted by <strong>{host.displayName}</strong>
+                  Hosted by <Link to={`/profile/${host.userName}`}><strong>{host.displayName}</strong></Link>
                 </p>
               </Item.Content>
             </Item>
@@ -66,11 +66,11 @@ const ActivityDetailedHeader: React.FC<IProps> = ({ activity }) => {
             Manage Event
           </Button>
         ) : activity.isGoing ? (
-          <Button onClick={unattendActivity} loading={loading}>
+          <Button onClick={unattendActivity} loading={isLoading}>
             Cancel attendance
           </Button>
         ) : (
-          <Button onClick={attendActivity} loading={loading} color="teal">
+          <Button onClick={attendActivity} loading={isLoading} color="teal">
             Join Activity
           </Button>
         )}

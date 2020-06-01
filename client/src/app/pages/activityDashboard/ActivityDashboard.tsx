@@ -7,13 +7,13 @@ import LoadingComponent from '../../sharedComponents/LoadingComponent'
 
 const ActivityDashboard: React.FC = () => {
   const rootStore = useContext(RootStoreContext)
-  const { loadingInitial, loadActivities } = rootStore.activityStore
+  const { isLoadingInitial, loadActivities } = rootStore.activityStore
 
   useEffect(() => {
     loadActivities()
   }, [loadActivities])
 
-  if (loadingInitial)
+  if (isLoadingInitial)
     return <LoadingComponent content="Loading activities..." />
 
   return (
