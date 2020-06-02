@@ -1,5 +1,5 @@
-import { IActivity, IAttendee } from '../models/Activity'
-import { IUser } from '../models/User'
+import { IActivity, IAttendee } from '../models/activity'
+import { IUser } from '../models/user'
 
 export const combineDateAndTime = (date: Date, time: Date) => {
   const timeString = time.getHours() + ':' + time.getMinutes() + ':00'

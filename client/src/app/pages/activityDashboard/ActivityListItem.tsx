@@ -2,7 +2,7 @@ import React from 'react'
 import { Item, Button, Segment, Icon, Label } from 'semantic-ui-react'
 import { Link } from 'react-router-dom'
 import { format } from 'date-fns'
-import { IActivity } from '../../models/Activity'
+import { IActivity } from '../../models/activity'
 import ActivityListItemAttendees from './ActivityListItemAttendees'
 
 interface IProps {

@@ -1,9 +1,9 @@
 import axios, { AxiosResponse } from 'axios'
 import { toast } from 'react-toastify'
 import { history } from '../index'
-import { IUserFormValues, IUser } from './models/User'
-import { IActivity } from './models/Activity'
-import { IProfile, IPhoto } from './models/Profile'
+import { IUserFormValues, IUser } from './models/user'
+import { IActivity } from './models/activity'
+import { IProfile, IPhoto } from './models/profile'
 
 //separate API calls from components
 //this file defines all api calls

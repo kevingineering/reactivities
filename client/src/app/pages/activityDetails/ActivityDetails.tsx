@@ -4,7 +4,7 @@ import { Grid } from 'semantic-ui-react'
 import { observer } from 'mobx-react-lite'
 import ActivityDetailsHeader from './ActivityDetailedHeader'
 import ActivityDetailedInfo from './ActivityDetailedInfo'
-import ActivityDetailedChats from './ActivityDetailedChats'
+import ActivityDetailedChat from './ActivityDetailedChat'
 import ActivityDetailedSidebar from './ActivityDetailedSidebar'
 import { RootStoreContext } from '../../stores/rootStore'
 import LoadingComponent from '../../sharedComponents/LoadingComponent'
@@ -37,7 +37,7 @@ const ActivityDetails: React.FC<RouteComponentProps<DetailParams>> = (
       <Grid.Column width={10}>
         <ActivityDetailsHeader activity={currentActivity} />
         <ActivityDetailedInfo activity={currentActivity} />
-        <ActivityDetailedChats />
+        <ActivityDetailedChat id={props.match.params.id}/>
       </Grid.Column>
       <Grid.Column width={6}>
         <ActivityDetailedSidebar attendees={currentActivity.attendees}/>

@@ -1,11 +1,16 @@
 import { observable, action, computed, runInAction } from 'mobx'
 import { SyntheticEvent } from 'react'
 import { toast } from 'react-toastify'
-import { IActivity } from '../models/Activity'
+import { IActivity } from '../models/activity'
 import agent from '../httpAgent'
 import { history } from '../../index'
 import RootStore from './rootStore'
 import { setActivityProps, createAttendee } from '../utilityFunctions/util'
+import {
+  HubConnection,
+  HubConnectionBuilder,
+  LogLevel,
+} from '@microsoft/signalr'
 
 export default class ActivityStore {
   //create rootstore property and add include in constructor - used to add ActivityStore to root
@@ -26,6 +31,62 @@ export default class ActivityStore {
   @observable target = ''
   //general loading, used for attend/unattend
   @observable isLoading = false
+  //SignalR - we don't want whole class to be observed, just reference
+  @observable.ref hubConnection: HubConnection | null = null
+
+  @action createHubConnection = (activityId: string) => {
+    this.hubConnection = new HubConnectionBuilder()
+      .withUrl('http://localhost:5000/chat', {
+        //string containing access token - usually we get token from Http header, but with signalR we get it from query string (different protocol)
+        accessTokenFactory: () => this.rootStore.commonStore.token!,
+      })
+      .configureLogging(LogLevel.Information)
+      .build()
+
+    //start connection
+    this.hubConnection
+      .start()
+      .then(() => {
+        // console.log('Attempting to join SignalR group.')
+        this.hubConnection!.invoke('AddToGroup', activityId)
+      })
+      .catch((error) =>
+        console.log(error)
+      )
+
+    //creates handler for when comment received
+    //note ReceiveComment matches ChatHub
+    this.hubConnection.on('ReceiveComment', (comment) => {
+      runInAction('receiveComment', () =>
+        this.currentActivity!.comments.push(comment)
+      )
+    })
+
+    this.hubConnection.on('Send', (message) => {
+      toast.info(message)
+    })
+  }
+
+  @action stopHubConnection = () => {
+    this.hubConnection!.invoke('RemoveFromGroup', this.currentActivity!.id)
+      .then(() => this.hubConnection!.stop())
+      // .then(() => console.log('Connection stopped.'))
+      // .catch((err) => console.log(err))
+  }
+
+  @action addComment = async (values: any) => {
+    try {
+      //add activity id to values
+      values.activityId = this.currentActivity!.id
+
+      //invoke method on SignalR API and pass values
+      //note that this does not return anything, instead a new 'ReceiveComment' event will occur
+      await this.hubConnection!.invoke('SendComment', values)
+    } catch (error) {
+      console.log(error)
+    }
+    this.hubConnection?.send('')
+  }
 
   //sorts activities by date
   @computed get activitiesByDate() {
@@ -132,6 +193,7 @@ export default class ActivityStore {
       activity.attendees = attendees
       activity.isHost = true
       activity.isGoing = true
+      activity.comments = []
       runInAction('create activity', () => {
         this.activityRegistry.set(activity.id, activity)
         this.isSubmitting = false
@@ -194,7 +256,10 @@ export default class ActivityStore {
         if (this.currentActivity) {
           this.currentActivity.attendees.push(attendee)
           this.currentActivity.isGoing = true
-          this.activityRegistry.set(this.currentActivity.id, this.currentActivity)
+          this.activityRegistry.set(
+            this.currentActivity.id,
+            this.currentActivity
+          )
           this.isLoading = false
         }
       })
@@ -217,7 +282,10 @@ export default class ActivityStore {
             (a) => a.userName !== this.rootStore.userStore.user?.userName
           )
           this.currentActivity.isGoing = false
-          this.activityRegistry.set(this.currentActivity.id, this.currentActivity)
+          this.activityRegistry.set(
+            this.currentActivity.id,
+            this.currentActivity
+          )
           this.isLoading = false
         }
       })

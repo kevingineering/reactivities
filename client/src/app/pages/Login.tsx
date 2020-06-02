@@ -4,7 +4,7 @@ import { Form, Button, Header } from 'semantic-ui-react'
 import { FORM_ERROR } from 'final-form'
 import { isRequired, combineValidators } from 'revalidate'
 import { RootStoreContext } from '../stores/rootStore'
-import { IUserFormValues } from '../models/User'
+import { IUserFormValues } from '../models/user'
 import TextInput from '../sharedComponents/formComponents/TextInput'
 import ErrorMessage from '../sharedComponents/formComponents/ErrorMessage'
 

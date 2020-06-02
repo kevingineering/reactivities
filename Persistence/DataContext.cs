@@ -17,8 +17,8 @@ namespace Persistence
     public DbSet<Domain.Activity> Activities { get; set; }
     //AppUser is not required as DbSet because it is passed in at the class level
     public DbSet<Domain.UserActivity> UserActivities { get; set; }
-
     public DbSet<Domain.Photo> Photos { get; set; }
+    public DbSet<Domain.Comment> Comments { get; set; }
 
     //adding data to database when migration is created
     protected override void OnModelCreating(ModelBuilder builder)

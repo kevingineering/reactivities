@@ -2,7 +2,7 @@ import React, { useContext } from 'react'
 import { Segment, Item, Header, Button, Image } from 'semantic-ui-react'
 import { Link } from 'react-router-dom'
 import { format } from 'date-fns'
-import { IActivity } from '../../models/Activity'
+import { IActivity } from '../../models/activity'
 import { RootStoreContext } from '../../stores/rootStore'
 import { observer } from 'mobx-react-lite'
 

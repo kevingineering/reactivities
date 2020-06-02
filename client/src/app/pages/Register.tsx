@@ -1,7 +1,7 @@
 import React, { useContext } from 'react'
 import { Form as FinalForm, Field } from 'react-final-form'
 import { RootStoreContext } from '../stores/rootStore'
-import { IUserFormValues } from '../models/User'
+import { IUserFormValues } from '../models/user'
 import { FORM_ERROR } from 'final-form'
 import { isRequired, combineValidators } from 'revalidate'
 import { Form, Header, Button } from 'semantic-ui-react'

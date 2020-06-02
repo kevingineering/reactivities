@@ -9,7 +9,7 @@ import {
   Divider,
   Reveal,
 } from 'semantic-ui-react'
-import { IProfile } from '../../models/Profile'
+import { IProfile } from '../../models/profile'
 import { observer } from 'mobx-react-lite'
 
 interface IProps {

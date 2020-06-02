@@ -3,7 +3,7 @@ import { Form as FinalForm, Field } from 'react-final-form'
 import TextInput from '../../sharedComponents/formComponents/TextInput'
 import TextAreaInput from '../../sharedComponents/formComponents/TextAreaInput'
 import { isRequired, combineValidators } from 'revalidate'
-import { IProfile } from '../../models/Profile'
+import { IProfile } from '../../models/profile'
 import { Button, Form } from 'semantic-ui-react'
 import { observer } from 'mobx-react-lite'
 

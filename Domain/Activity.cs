@@ -23,5 +23,7 @@ namespace Domain
     //defines relationship between AppUser and UserActivity
     //virtual keyword is required for lazy loading
     public virtual ICollection<UserActivity> UserActivities { get; set; }
+
+    public virtual ICollection<Comment> Comments { get; set; }
   }
 }

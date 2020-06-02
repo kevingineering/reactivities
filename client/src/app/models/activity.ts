@@ -13,6 +13,7 @@ export interface IActivity {
   isGoing: boolean
   isHost: boolean
   attendees: IAttendee[]
+  comments: IComment[]
 }
 
 //extends IActivity but makes all properties optional
@@ -46,4 +47,13 @@ export interface IAttendee {
   displayName: string
   image: string | null
   isHost: boolean
+}
+
+export interface IComment {
+  id: string
+  createdAt: Date
+  body: string
+  userName: string
+  displayName: string
+  image: string
 }

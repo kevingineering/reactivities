@@ -13,6 +13,7 @@ using Microsoft.Extensions.DependencyInjection; //IServiceCollection, AddDbConte
 using Microsoft.Extensions.Hosting; //env
 using Microsoft.IdentityModel.Tokens; //TokenValidationParameters
 using AutoMapper;
+using System.Threading.Tasks;
 
 namespace API
 {
@@ -48,7 +49,7 @@ namespace API
       {
         opt.AddPolicy("CorsPolicy", policy =>
         {
-          policy.AllowAnyHeader().AllowAnyMethod().WithOrigins("http://localhost:3000");
+          policy.AllowAnyHeader().AllowAnyMethod().WithOrigins("http://localhost:3000").AllowCredentials();
         });
       });
 
@@ -56,7 +57,9 @@ namespace API
       services.AddMediatR(typeof(Application.Activities.List.Handler).Assembly);
 
       //tell assembly to go and look for mapping profiles 
-      services.AddAutoMapper(typeof (Application.Activities.List.Handler));
+      services.AddAutoMapper(typeof(Application.Activities.List.Handler));
+
+      services.AddSignalR();
 
       //adding controllers - previously AddMvc - AddController removes functionality we do not need (e.g. razor views)
       //Authorization policy means everything requires authorization unless marked otherwise
@@ -82,9 +85,9 @@ namespace API
       identityBuilder.AddSignInManager<SignInManager<Domain.AppUser>>();
 
       //adds authorization policy to check if user is host of activity
-      services.AddAuthorization(opt => 
+      services.AddAuthorization(opt =>
       {
-        opt.AddPolicy("IsActivityHost", policy => 
+        opt.AddPolicy("IsActivityHost", policy =>
         {
           policy.Requirements.Add(new Infrastructure.Security.IsHostRequirement());
         });
@@ -106,6 +109,26 @@ namespace API
             IssuerSigningKey = key, //key used to create token
             ValidateAudience = false, //could be url it comes from 
             ValidateIssuer = false //would be local host or servicer
+          };
+          //add token to SignalR Hub context - https://docs.microsoft.com/en-us/aspnet/core/signalr/authn-and-authz?view=aspnetcore-3.1
+          opt.Events = new JwtBearerEvents
+          {
+            OnMessageReceived = context =>
+            {
+              //get token from context
+              var accessToken = context.Request.Query["access_token"];
+
+              //get path
+              var path = context.HttpContext.Request.Path;
+
+              //if token exists and path matches our endpoint
+              if (!string.IsNullOrEmpty(accessToken) && (path.StartsWithSegments("/chat")))
+              {
+                context.Token = accessToken;
+              }
+
+              return Task.CompletedTask;
+            }
           };
         });
 
@@ -148,10 +171,11 @@ namespace API
       //determining if identified user has access
       app.UseAuthorization();
 
-      //adds endpoint execution 
+      //adds endpoint execution - controllers and signalR
       app.UseEndpoints(endpoints =>
       {
         endpoints.MapControllers();
+        endpoints.MapHub<SignalR.ChatHub>("/chat");
       });
     }
   }

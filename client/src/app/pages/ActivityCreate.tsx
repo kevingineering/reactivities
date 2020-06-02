@@ -11,7 +11,7 @@ import {
   hasLengthGreaterThan,
 } from 'revalidate'
 import { RootStoreContext } from '../stores/rootStore'
-import { ActivityFormValues } from '../models/Activity'
+import { ActivityFormValues } from '../models/activity'
 import { combineDateAndTime } from '../utilityFunctions/util'
 import TextInput from '../sharedComponents/formComponents/TextInput'
 import TextAreaInput from '../sharedComponents/formComponents/TextAreaInput'

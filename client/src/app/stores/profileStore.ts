@@ -1,7 +1,7 @@
 import { observable, action, computed, runInAction } from 'mobx'
 import agent from '../httpAgent'
 import RootStore from './rootStore'
-import { IProfile, IPhoto } from '../models/Profile'
+import { IProfile, IPhoto } from '../models/profile'
 import { toast } from 'react-toastify'
 
 export default class ProfileStore {
