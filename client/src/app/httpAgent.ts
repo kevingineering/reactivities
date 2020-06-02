@@ -74,10 +74,12 @@ const requests = {
   postForm: (url: string, file: Blob) => {
     let formData = new FormData() //creates key-value pair
     formData.append('File', file)
-    return axios.post(url, formData, {
-      headers: {'Content-type': 'multipart/form-data'}
-    }).then(responseBody)
-  } 
+    return axios
+      .post(url, formData, {
+        headers: { 'Content-type': 'multipart/form-data' },
+      })
+      .then(responseBody)
+  },
 }
 
 //activities requests
@@ -89,7 +91,7 @@ const Activities = {
     requests.put(`/activities/${activity.id}`, activity),
   delete: (id: string) => requests.del(`/activities/${id}`),
   attend: (id: string) => requests.post(`/activities/attend/${id}`, {}),
-  unattend: (id: string) => requests.del(`/activities/attend/${id}`)
+  unattend: (id: string) => requests.del(`/activities/attend/${id}`),
 }
 
 //user requests
@@ -103,8 +105,11 @@ const Users = {
 }
 
 const Profiles = {
-  get: (userName: string): Promise<IProfile> => requests.get(`/profiles/${userName}`),
-  uploadPhoto: (photo: Blob): Promise<IPhoto> => requests.postForm('/photos', photo),
+  get: (userName: string): Promise<IProfile> =>
+    requests.get(`/profiles/${userName}`),
+  update: (profile: IProfile) => requests.put(`/profiles`, profile),
+  uploadPhoto: (photo: Blob): Promise<IPhoto> =>
+    requests.postForm('/photos', photo),
   setMainPhoto: (id: string) => requests.post(`/photos/setmain/${id}`, {}),
   deletePhoto: (id: string) => requests.del(`/photos/${id}`),
 }

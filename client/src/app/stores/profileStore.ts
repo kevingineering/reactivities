@@ -113,4 +113,21 @@ export default class ProfileStore {
       })
     }
   }
+
+  @action update = async (profile: IProfile) => {
+    try {
+      await agent.Profiles.update(profile)
+      runInAction('updateProfile', () => {
+        if (profile.displayName !== this.rootStore.userStore.user!.displayName)
+        {
+          this.rootStore.userStore.user!.displayName = profile.displayName!
+        }
+        this.profile!.displayName = profile.displayName!
+        this.profile!.bio = profile.bio!
+      })
+    } catch (error) {
+      console.log(error)
+      toast.error('Problem updating profile.')
+    }
+  }
 }

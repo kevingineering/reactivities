@@ -18,6 +18,7 @@ namespace Application.Activities
     {
       private readonly Persistence.DataContext _context;
       private readonly Application.Interfaces.IUserAccessor _userAccessor;
+      
       public Handler(Persistence.DataContext context, Application.Interfaces.IUserAccessor userAccessor)
       {
         _context = context;

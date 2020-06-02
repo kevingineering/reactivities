@@ -3,17 +3,18 @@ import { Tab } from 'semantic-ui-react'
 import { IProfile } from '../../models/Profile'
 import { observer } from 'mobx-react-lite'
 import ProfilePhotos from './ProfilePhotos'
+import ProfileDescription from './ProfileDescription'
 
 interface IProps {
   profile: IProfile
 }
 
 const panes = [
-  { menuItem: 'About', render: () => <Tab.Pane>About Content</Tab.Pane> },
+  { menuItem: 'About', render: () => <ProfileDescription /> },
   { menuItem: 'Photos', render: () => <ProfilePhotos /> },
   {
     menuItem: 'Activities',
-    render: () => <Tab.Pane>Activites content</Tab.Pane>,
+    render: () => <Tab.Pane>Activities content</Tab.Pane>,
   },
   {
     menuItem: 'Followers',
@@ -31,7 +32,6 @@ const ProfileContent: React.FC<IProps> = ({ profile }) => {
       menu={{ fluid: true, vertical: true }}
       menuPosition="right"
       panes={panes}
-      activeIndex={1} //index starts with 'About' as 0
     />
   )
 }

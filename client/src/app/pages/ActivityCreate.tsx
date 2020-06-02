@@ -50,6 +50,7 @@ const ActivityCreate: React.FC<RouteComponentProps<DetailParams>> = (props) => {
   const [activity, setActivity] = useState(new ActivityFormValues())
   const [isLoading, setIsLoading] = useState(false)
 
+  //get activities
   useEffect(() => {
     if (props.match.params.id) {
       setIsLoading(true)
