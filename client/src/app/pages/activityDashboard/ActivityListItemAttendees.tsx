@@ -12,7 +12,12 @@ const ActivityListItemAttendees: React.FC<IProps> = ({ attendees }) => {
       <Popup
         header={a.displayName}
         trigger={
-          <Image size="mini" circular src={a.image || '/assets/user.png'} />
+          <Image
+            size="mini"
+            circular
+            src={a.image || '/assets/user.png'}
+            style={a.isFollowing ? { border: '2px solid orange' } : {}}
+          />
         }
       />
     </List.Item>

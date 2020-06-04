@@ -112,6 +112,9 @@ const Profiles = {
     requests.postForm('/photos', photo),
   setMainPhoto: (id: string) => requests.post(`/photos/setmain/${id}`, {}),
   deletePhoto: (id: string) => requests.del(`/photos/${id}`),
+  follow: (userName: string) => requests.post(`/following/${userName}`, {}),
+  unfollow: (userName: string) => requests.del(`/following/${userName}`),
+  listFollowings: (userName: string, predicate: string) => requests.get(`/following/${userName}?predicate=${predicate}`)
 }
 
 export default {

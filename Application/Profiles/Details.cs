@@ -16,34 +16,16 @@ namespace Application.Profiles
 
     public class Handler : IRequestHandler<Query, Profile>
     {
-      private readonly Persistence.DataContext _context;
-      public Handler(Persistence.DataContext context)
+      private readonly IProfileReader _profileReader;
+
+      public Handler(IProfileReader profileReader)
       {
-        _context = context;
+        _profileReader = profileReader;
       }
 
       public async Task<Profile> Handle(Query request, CancellationToken cancellationToken)
       {
-        //get user
-        var user = await _context.Users.SingleOrDefaultAsync(x => x.UserName == request.UserName);
-
-        //verify user exists
-        if (user == null)
-        {
-          throw new Application.Errors.RestException(HttpStatusCode.NotFound, new { user = "User not found." });
-        }
-
-        //create profile
-        var profile = new Profile
-        {
-            DisplayName = user.DisplayName,
-            UserName = user.UserName,
-            Image = user.Photos.FirstOrDefault(x => x.IsMain)?.Url,
-            Bio = user.Bio,
-            Photos = user.Photos
-        };
-
-        return profile;
+        return await _profileReader.ReadProfile(request.UserName);
       }
     }
   }

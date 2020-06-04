@@ -48,7 +48,7 @@ const ActivityDetailedChat: React.FC<IProps> = ({ id }) => {
                     {comment.displayName}
                   </Comment.Author>
                   <Comment.Metadata>
-                    <div>{formatDistance(comment.createdAt, new Date)}</div>
+                    <div>{formatDistance(comment.createdAt, new Date())}</div>
                   </Comment.Metadata>
                   <Comment.Text>{comment.body}</Comment.Text>
                 </Comment.Content>

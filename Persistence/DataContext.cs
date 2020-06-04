@@ -20,6 +20,9 @@ namespace Persistence
     public DbSet<Domain.Photo> Photos { get; set; }
     public DbSet<Domain.Comment> Comments { get; set; }
 
+    public DbSet<Domain.UserFollowing> Followings { get; set; }
+
+
     //adding data to database when migration is created
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -45,6 +48,23 @@ namespace Persistence
         .HasOne(a => a.Activity)
         .WithMany(ua => ua.UserActivities)
         .HasForeignKey(a => a.ActivityId);
+
+      //define follower/following relationship
+      builder.Entity<Domain.UserFollowing>(b =>
+      {
+        //combination key
+        b.HasKey(k => new { k.ObserverId, k.TargetId });
+
+        b.HasOne(o => o.Observer)
+          .WithMany(f => f.Followings)
+          .HasForeignKey(o => o.ObserverId)
+          .OnDelete(DeleteBehavior.Restrict);
+
+        b.HasOne(t => t.Target)
+          .WithMany(f => f.Followers)
+          .HasForeignKey(t => t.TargetId)
+          .OnDelete(DeleteBehavior.Restrict);
+      });
     }
   }
 }
