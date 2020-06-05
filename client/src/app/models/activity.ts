@@ -21,6 +21,11 @@ export interface IActivityFormValues extends Partial<IActivity> {
   time?: Date
 }
 
+export interface IActivitiesEnvelope {
+  activities: IActivity[]
+  activityCount: number
+}
+
 //when new instance is created it has these default values
 export class ActivityFormValues implements IActivityFormValues {
   id?: string = undefined

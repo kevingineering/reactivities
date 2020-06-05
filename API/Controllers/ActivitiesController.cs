@@ -1,5 +1,4 @@
 using System; //Guid
-using System.Collections.Generic; //List
 using System.Threading.Tasks; //Task
 using MediatR; //IMediator
 using Microsoft.AspNetCore.Authorization;
@@ -11,9 +10,9 @@ namespace API.Controllers
   public class ActivitiesController : BaseController
   {
     [HttpGet]
-    public async Task<ActionResult<List<Application.Activities.ActivityDTO>>> List()
+    public async Task<ActionResult<Application.Activities.List.ActivitiesEnvelope>> List(int? limit, int? offset, bool isGoing, bool isHost, DateTime? startDate)
     {
-      return await Mediator.Send(new Application.Activities.List.Query());
+      return await Mediator.Send(new Application.Activities.List.Query(limit, offset, isGoing, isHost, startDate));
     }
 
     [HttpGet("{id}")] //id available as variable

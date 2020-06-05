@@ -4,6 +4,7 @@ import { observer } from 'mobx-react-lite'
 import ProfilePhotos from './ProfilePhotos'
 import ProfileDescription from './ProfileDescription'
 import ProfileFollowing from './ProfileFollowing'
+import ProfileActivities from './ProfileActivities'
 
 interface IProps {
   setActiveTab: (activeIndex: any) => void
@@ -14,7 +15,7 @@ const panes = [
   { menuItem: 'Photos', render: () => <ProfilePhotos /> },
   {
     menuItem: 'Activities',
-    render: () => <Tab.Pane>Activities content</Tab.Pane>,
+    render: () => <ProfileActivities />,
   },
   {
     menuItem: 'Followers',
