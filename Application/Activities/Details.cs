@@ -20,7 +20,7 @@ namespace Application.Activities
     {
       private readonly Persistence.DataContext _context;
       private readonly IMapper _mapper;
-      //inject data context
+
       public Handler(Persistence.DataContext context, IMapper mapper)
       {
         _context = context;
@@ -31,15 +31,15 @@ namespace Application.Activities
       {
         //eager loading related data requires include statements and SingleOrDefaultAsync method
         var activity = await _context.Activities
-          // .Include(x => x.UserActivities)
-          // .ThenInclude(x => x.AppUser)
-          // .SingleOrDefaultAsync(x => x.Id == request.Id);
+            // .Include(x => x.UserActivities)
+            // .ThenInclude(x => x.AppUser)
+            // .SingleOrDefaultAsync(x => x.Id == request.Id);
             .FindAsync(request.Id);
 
 
         //throw custom exception if activity is not found
         if (activity == null)
-          throw new Application.Errors.RestException(HttpStatusCode.NotFound, new {activity = "Activity not found."});
+          throw new Application.Errors.RestException(HttpStatusCode.NotFound, new { activity = "Activity not found." });
 
         var returnActivity = _mapper.Map<Domain.Activity, ActivityDTO>(activity);
         return returnActivity;

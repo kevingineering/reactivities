@@ -26,7 +26,7 @@ namespace API
         try
         {
           var context = services.GetRequiredService<Persistence.DataContext>();
-          
+
           //for identity
           var userManager = services.GetRequiredService<UserManager<Domain.AppUser>>();
 
@@ -56,7 +56,7 @@ namespace API
     {
       return Host.CreateDefaultBuilder(args).ConfigureWebHostDefaults(webBuilder =>
         {
-          webBuilder.UseStartup<API.Startup>();
+          webBuilder.UseKestrel(x => x.AddServerHeader = false).UseStartup<API.Startup>();
         });
     }
   }

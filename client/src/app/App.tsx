@@ -18,6 +18,7 @@ import { RootStoreContext } from './stores/rootStore'
 import LoadingComponent from './sharedComponents/LoadingComponent'
 import ModalContainer from './sharedComponents/ModalContainer'
 import ProfilePage from './pages/profile/ProfilePage'
+import PrivateRoute from './sharedComponents/PrivateRoute'
 
 const App: React.FC<RouteComponentProps> = (props) => {
   const rootStore = useContext(RootStoreContext)
@@ -50,15 +51,15 @@ const App: React.FC<RouteComponentProps> = (props) => {
             <Navbar />
             <Container style={{ marginTop: '7em' }}>
               <Switch>
-                <Route exact path="/activities" component={ActivityDashboard} />
-                <Route path="/activities/:id" component={ActivityDetails} />
+                <PrivateRoute exact path="/activities" component={ActivityDashboard} />
+                <PrivateRoute path="/activities/:id" component={ActivityDetails} />
                 {/* Note that you can pass an array for your route. Note also that we are using a key. A key forces a component to rerender even if nothing appears to have changed. Our key here is dependent on props. To get props, we need to use the HOC withRouter. All this allows us to update the form on the createActivity page so that it is empty when a user clicks the createActivity button after rerouting there from the /manage/:id page */}
-                <Route
+                <PrivateRoute
                   path={['/createActivity', '/manage/:id']}
                   component={ActivityCreate}
                   key={props.location.key}
                 />
-                <Route
+                <PrivateRoute
                   exact
                   path="/profile/:userName"
                   component={ProfilePage}

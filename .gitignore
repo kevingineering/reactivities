@@ -5,7 +5,11 @@ obj
 
 #in case we have keys
 appsettings.json
+appsettings.Development.json
 
 *.db
 *.txt
 .notes
+
+wwwroot
+publish

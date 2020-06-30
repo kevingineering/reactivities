@@ -9,7 +9,7 @@ import { IProfile, IPhoto } from './models/profile'
 //this file defines all api calls
 
 //base path - every call will start with this url
-axios.defaults.baseURL = 'http://localhost:5000/api'
+axios.defaults.baseURL = process.env.REACT_APP_API_URL
 
 //for every response, catch errors if they exist
 //takes two parameters - what to do when response is fulfilled, what to do when response is rejected
@@ -17,11 +17,17 @@ axios.interceptors.response.use(undefined, (error) => {
   if (error.message === 'Network Error' && !error.response) {
     toast.error('Network error - make sure API is running!')
   }
-  const { status, config, data } = error.response
+  const { status, config, data, headers } = error.response
   if (status === 404) {
     history.push('/notfound')
   }
-
+  //check to see if token has expired
+  if (status === 401 && headers['www-authenticate'].includes('Bearer error="invalid_token", error_description="The token expired')) {
+    window.localStorage.removeItem('jwt')
+    console.log(error.response)
+    history.push('/')
+    toast.info('Your session has expired, please log in again to continue.')
+  }
   //verification error if path requiring GUID is not sent GUID
   if (
     status === 400 &&
@@ -57,20 +63,20 @@ axios.interceptors.request.use(
 //store request in a constant
 const responseBody = (response: AxiosResponse) => response.data
 
-//adding delay to API for realism during development - currying function
-const sleep = (ms: number) => (response: AxiosResponse) =>
-  new Promise<AxiosResponse>((resolve) =>
-    setTimeout(() => resolve(response), ms)
-  )
+//can add delay to API for realism during development - currying function - add .then(sleep(1000)) after axios requests below
+// const sleep = (ms: number) => (response: AxiosResponse) =>
+//   new Promise<AxiosResponse>((resolve) =>
+//     setTimeout(() => resolve(response), ms)
+//   )
 
 //create a request object
 const requests = {
-  get: (url: string) => axios.get(url).then(sleep(1000)).then(responseBody),
+  get: (url: string) => axios.get(url).then(responseBody),
   post: (url: string, body: {}) =>
-    axios.post(url, body).then(sleep(1000)).then(responseBody),
+    axios.post(url, body).then(responseBody),
   put: (url: string, body: {}) =>
-    axios.put(url, body).then(sleep(1000)).then(responseBody),
-  del: (url: string) => axios.delete(url).then(sleep(1000)).then(responseBody),
+    axios.put(url, body).then(responseBody),
+  del: (url: string) => axios.delete(url).then(responseBody),
   postForm: (url: string, file: Blob) => {
     let formData = new FormData() //creates key-value pair
     formData.append('File', file)
@@ -88,7 +94,6 @@ const Activities = {
   list: (params: URLSearchParams): Promise<IActivitiesEnvelope> =>
     axios
       .get(`/activities`, { params: params })
-      .then(sleep(1000))
       .then(responseBody),
   details: (id: string) => requests.get(`/activities/${id}`),
   create: (activity: IActivity) => requests.post('/activities', activity),

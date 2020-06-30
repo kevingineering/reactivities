@@ -10,10 +10,10 @@ using Microsoft.AspNetCore.Mvc.Authorization; //AuthorizeFilter
 using Microsoft.EntityFrameworkCore; //UseSQLite
 using Microsoft.Extensions.Configuration; //GetConnectionString, IConfiguration
 using Microsoft.Extensions.DependencyInjection; //IServiceCollection, AddDbContext, AddControlers
-using Microsoft.Extensions.Hosting; //env
 using Microsoft.IdentityModel.Tokens; //TokenValidationParameters
 using AutoMapper;
 using System.Threading.Tasks;
+using System;
 
 namespace API
 {
@@ -28,15 +28,15 @@ namespace API
     //represents key/value pair 
     public IConfiguration Configuration { get; }
 
-    // This method gets called by the runtime. 
-    //dependency injection container
-    public void ConfigureServices(IServiceCollection services)
+    //ConfigureServices is a dependency injection container called by the runtime.
+    //Environment specific versions (e.g. ConfigureDevelopmentServices) will be called if they exist, but ConfigureServices is the fall back.
+    //https://docs.microsoft.com/en-us/aspnet/core/fundamentals/environments?view=aspnetcore-3.1
+
+    //Configure is used to configure the HTTP request pipeline (middleware - order is important!). It is called by the runtime.
+    //Environments specific versions are available here as with ConfigureServices.
+
+    public void ConfigureDevelopmentServices(IServiceCollection services)
     {
-      //AddTransient - alwayts different, a new instance is provided to every controller and every service
-      //AddScoped - same within a request, but different across different requests
-      //AddSingleton - same for every object and every request
-
-
       //UseSqlite takes connection string from configuration files
       services.AddDbContext<Persistence.DataContext>(opt =>
       {
@@ -44,12 +44,37 @@ namespace API
         opt.UseSqlite(Configuration.GetConnectionString("DefaultConnection"));
       });
 
+      ConfigureServices(services);
+    }
+
+    public void ConfigureProductionServices(IServiceCollection services)
+    {
+      services.AddDbContext<Persistence.DataContext>(opt =>
+      {
+        opt.UseLazyLoadingProxies();
+        opt.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
+      });
+
+      ConfigureServices(services);
+    }
+
+    public void ConfigureServices(IServiceCollection services)
+    {
+      //AddTransient - alwayts different, a new instance is provided to every controller and every service
+      //AddScoped - same within a request, but different across different requests
+      //AddSingleton - same for every object and every request
+
       //add CORS headers - allow anything from localhost
       services.AddCors(opt =>
       {
         opt.AddPolicy("CorsPolicy", policy =>
         {
-          policy.AllowAnyHeader().AllowAnyMethod().WithOrigins("http://localhost:3000").AllowCredentials();
+          policy
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .WithExposedHeaders("WWW-Authenticate") //necessary to determine if token has expired
+            .WithOrigins("http://localhost:3000")
+            .AllowCredentials();
         });
       });
 
@@ -108,7 +133,9 @@ namespace API
             ValidateIssuerSigningKey = true, //check signing key first to make sure token originated here
             IssuerSigningKey = key, //key used to create token
             ValidateAudience = false, //could be url it comes from 
-            ValidateIssuer = false //would be local host or servicer
+            ValidateIssuer = false, //would be local host or servicer
+            ValidateLifetime = true, //checks token expiry date - has ~5 minute leeway
+            ClockSkew = TimeSpan.Zero //eliminate ValidateLifetime's leeway
           };
           //add token to SignalR Hub context - https://docs.microsoft.com/en-us/aspnet/core/signalr/authn-and-authz?view=aspnetcore-3.1
           opt.Events = new JwtBearerEvents
@@ -142,8 +169,6 @@ namespace API
       services.Configure<Infrastructure.Photos.CloudinarySettings>(Configuration.GetSection("Cloudinary"));
     }
 
-    // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-    //can add middleware - order is important
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
       //use custom error handling middleware
@@ -155,11 +180,29 @@ namespace API
       //   app.UseDeveloperExceptionPage();
       // }
 
+      //add middleware to add security headers
+      app.UseXContentTypeOptions(); //prevents content sniffing
+      app.UseReferrerPolicy(opt => opt.NoReferrer()); //restricts amount of info sent to other sites when refering to other sites
+      app.UseXXssProtection(opt => opt.EnabledWithBlockMode()); //stop loading page when cross site scripting attack is identified - cross site scripting attacks occur when people add code inside your web page
+      app.UseXfo(opt => opt.Deny()); //blocks Iframes and prevents clickjacking attacks - clickjacking occurs when a malicious user/website places an iframe over your site so other users intend to click on your content but click on something else instead
+      //app.UseCspReportOnly - get list of things wrong with site
+      app.UseCsp(opt => opt
+        .BlockAllMixedContent() //prevents loading any assets using Http when page is loaded using Https
+                                //set sources below - external (such as google), self, hash identifiers (has comes from report), and blob: or data:
+        .StyleSources(s => s.Self().CustomSources("https://fonts.googleapis.com", "sha256-F4GpCPyRepgP5znjMD8sc7PEjzet5Eef4r09dEGPpTs="))
+        .FontSources(s => s.Self().CustomSources("https://fonts.gstatic.com", "data:"))
+        .FormActions(s => s.Self())
+        .FrameAncestors(s => s.Self())
+        .ImageSources(s => s.Self().CustomSources("https://res.cloudinary.com", "blob:", "data:"))
+        .ScriptSources(s => s.Self().CustomSources("sha256-eE1k/Cs1U0Li9/ihPPQ7jKIGDvR8fYw65VJw+txfifw="))
+      );
+
       //requests coming in on HTTP are redirected to HTTPS
       // app.UseHttpsRedirection();
 
       //static files go here
-      // app.UseStaticFiles();
+      app.UseDefaultFiles();
+      app.UseStaticFiles();
 
       //controls routing - adds route matching to the pipeline
       app.UseRouting();
@@ -178,6 +221,7 @@ namespace API
       {
         endpoints.MapControllers();
         endpoints.MapHub<SignalR.ChatHub>("/chat");
+        endpoints.MapFallbackToController("Index", "Fallback");
       });
     }
   }

@@ -1,6 +1,6 @@
 using System; //Guid
 using System.Threading.Tasks; //Task
-using MediatR; //IMediator
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 // using Microsoft.AspNetCore.Authorization; //Authorize - see Details Attributes
 using Microsoft.AspNetCore.Mvc; //Route, ApiController, ControllerBase
@@ -19,7 +19,7 @@ namespace API.Controllers
     // [Authorize] - would be required 
     public async Task<ActionResult<Application.Activities.ActivityDTO>> Details(Guid id)
     {
-      return await Mediator.Send(new Application.Activities.Details.Query {Id = id});
+      return await Mediator.Send(new Application.Activities.Details.Query { Id = id });
     }
 
     [HttpPost]
@@ -31,7 +31,7 @@ namespace API.Controllers
     [HttpPost("attend/{id}")]
     public async Task<ActionResult<Unit>> Attend(Guid id)
     {
-      return await Mediator.Send(new Application.Activities.Attend.Command {Id = id});
+      return await Mediator.Send(new Application.Activities.Attend.Command { Id = id });
     }
 
     [HttpPut("{id}")]
@@ -47,13 +47,13 @@ namespace API.Controllers
     [Authorize(Policy = "IsActivityHost")]
     public async Task<ActionResult<Unit>> Delete(Guid id)
     {
-      return await Mediator.Send(new Application.Activities.Delete.Command {Id = id});
+      return await Mediator.Send(new Application.Activities.Delete.Command { Id = id });
     }
 
     [HttpDelete("attend/{id}")]
     public async Task<ActionResult<Unit>> Unattend(Guid id)
     {
-      return await Mediator.Send(new Application.Activities.Unattend.Command {Id = id});
+      return await Mediator.Send(new Application.Activities.Unattend.Command { Id = id });
     }
   }
 }

@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Persistence.Migrations
 {
@@ -13,7 +14,12 @@ namespace Persistence.Migrations
           name: "Values",
           columns: table => new
           {
+            //Id edited so migration can be used for different db types
             Id = table.Column<int>(nullable: false)
+                  .Annotation("MySql:ValueGenerationStrategy",
+                  MySqlValueGenerationStrategy.IdentityColumn)
+                  .Annotation("SqlServer:ValueGenerationStrategy",
+                  SqlServerValueGenerationStrategy.IdentityColumn)
                   .Annotation("Sqlite:Autoincrement", true),
             Name = table.Column<string>(nullable: true)
           },

@@ -1,4 +1,4 @@
-import { observable, action, computed, runInAction, reaction } from 'mobx'
+import { observable, action, computed, runInAction, reaction, toJS } from 'mobx'
 import { SyntheticEvent } from 'react'
 import { toast } from 'react-toastify'
 import { IActivity } from '../models/activity'
@@ -78,9 +78,10 @@ export default class ActivityStore {
     this.page = page
   }
 
+
   @action createHubConnection = (activityId: string) => {
     this.hubConnection = new HubConnectionBuilder()
-      .withUrl('http://localhost:5000/chat', {
+      .withUrl(process.env.REACT_APP_CHAT_URL!, {
         //string containing access token - usually we get token from Http header, but with signalR we get it from query string (different protocol)
         accessTokenFactory: () => this.rootStore.commonStore.token!,
       })
@@ -203,7 +204,7 @@ export default class ActivityStore {
     let activity = this.getActivity(id)
     if (activity) {
       this.currentActivity = activity
-      return activity
+      return toJS(activity) //converts observable to JavaScript object
     } else {
       try {
         this.isLoadingInitial = true
