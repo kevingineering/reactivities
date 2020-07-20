@@ -14,6 +14,7 @@ using Microsoft.IdentityModel.Tokens; //TokenValidationParameters
 using AutoMapper;
 using System.Threading.Tasks;
 using System;
+using Microsoft.Extensions.Configuration.UserSecrets;
 
 namespace API
 {
@@ -60,7 +61,7 @@ namespace API
 
     public void ConfigureServices(IServiceCollection services)
     {
-      //AddTransient - alwayts different, a new instance is provided to every controller and every service
+      //AddTransient - always different, a new instance is provided to every controller and every service
       //AddScoped - same within a request, but different across different requests
       //AddSingleton - same for every object and every request
 
@@ -164,9 +165,11 @@ namespace API
       services.AddScoped<Application.Interfaces.IUserAccessor, Infrastructure.Security.UserAccessor>();
       services.AddScoped<Application.Interfaces.IPhotoAccessor, Infrastructure.Photos.PhotoAccessor>();
       services.AddScoped<Application.Profiles.IProfileReader, Application.Profiles.ProfileReader>();
+      services.AddScoped<Application.Interfaces.IFacebookAccessor, Infrastructure.Security.FacebookAccessor>();
 
       //configuration has access to dotnet user secrets, settings are strongly typed to the values contained in user secrets
       services.Configure<Infrastructure.Photos.CloudinarySettings>(Configuration.GetSection("Cloudinary"));
+      services.Configure<Infrastructure.Security.FacebookAppSettings>(Configuration.GetSection("Facebook"));
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

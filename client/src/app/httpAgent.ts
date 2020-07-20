@@ -22,9 +22,14 @@ axios.interceptors.response.use(undefined, (error) => {
     history.push('/notfound')
   }
   //check to see if token has expired
-  if (status === 401 && headers['www-authenticate'].includes('Bearer error="invalid_token", error_description="The token expired')) {
+  if (
+    status === 401 &&
+    headers['www-authenticate'] &&
+    headers['www-authenticate'].includes(
+      'Bearer error="invalid_token", error_description="The token expired'
+    )
+  ) {
     window.localStorage.removeItem('jwt')
-    console.log(error.response)
     history.push('/')
     toast.info('Your session has expired, please log in again to continue.')
   }
@@ -72,10 +77,8 @@ const responseBody = (response: AxiosResponse) => response.data
 //create a request object
 const requests = {
   get: (url: string) => axios.get(url).then(responseBody),
-  post: (url: string, body: {}) =>
-    axios.post(url, body).then(responseBody),
-  put: (url: string, body: {}) =>
-    axios.put(url, body).then(responseBody),
+  post: (url: string, body: {}) => axios.post(url, body).then(responseBody),
+  put: (url: string, body: {}) => axios.put(url, body).then(responseBody),
   del: (url: string) => axios.delete(url).then(responseBody),
   postForm: (url: string, file: Blob) => {
     let formData = new FormData() //creates key-value pair
@@ -92,9 +95,7 @@ const requests = {
 const Activities = {
   //note using axios with params for list
   list: (params: URLSearchParams): Promise<IActivitiesEnvelope> =>
-    axios
-      .get(`/activities`, { params: params })
-      .then(responseBody),
+    axios.get(`/activities`, { params: params }).then(responseBody),
   details: (id: string) => requests.get(`/activities/${id}`),
   create: (activity: IActivity) => requests.post('/activities', activity),
   edit: (activity: IActivity) =>
@@ -112,6 +113,8 @@ const Users = {
     requests.post('/user/login', user),
   register: (user: IUserFormValues): Promise<IUser> =>
     requests.post('/user/register', user),
+  fbLogin: (accessToken: string): Promise<IUser> =>
+    requests.post('/user/facebook', { accessToken }),
 }
 
 const Profiles = {
@@ -126,8 +129,8 @@ const Profiles = {
   unfollow: (userName: string) => requests.del(`/following/${userName}`),
   listFollowings: (userName: string, predicate: string) =>
     requests.get(`/following/${userName}?predicate=${predicate}`),
-  getUserActivities: (userName: string, predicate: string) => 
-    requests.get(`/profiles/activities/${userName}?predicate=${predicate}`)
+  getUserActivities: (userName: string, predicate: string) =>
+    requests.get(`/profiles/activities/${userName}?predicate=${predicate}`),
 }
 
 export default {

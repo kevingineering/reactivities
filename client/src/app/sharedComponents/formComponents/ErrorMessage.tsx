@@ -9,7 +9,8 @@ interface IProps {
 
 const ErrorMessage: React.FC<IProps> = ({ error, text }) => {
   //gets array of objects, each object has key and array
-  console.log(error)
+  console.log('error', error)
+
   const errors = error.data.errors
   //gets values (arrays) from array of objects, then concatenate arrays
   let errorMessages = []
@@ -19,7 +20,11 @@ const ErrorMessage: React.FC<IProps> = ({ error, text }) => {
     <Message error>
       <Message.Header>{error.statusText}</Message.Header>
       {errorMessages.length > 0 && (
-        <Message.List>{errorMessages.map((err, i) => <Message.Item key={i}>{err}</Message.Item>)}</Message.List>
+        <Message.List>
+          {errorMessages.map((err, i) => (
+            <Message.Item key={i}>{err}</Message.Item>
+          ))}
+        </Message.List>
       )}
       {text && <Message.Content content={text} />}
     </Message>

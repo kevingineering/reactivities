@@ -1,12 +1,14 @@
 import React, { useContext } from 'react'
 import { Form as FinalForm, Field } from 'react-final-form'
-import { Form, Button, Header } from 'semantic-ui-react'
+import { Form, Button, Header, Divider } from 'semantic-ui-react'
 import { FORM_ERROR } from 'final-form'
 import { isRequired, combineValidators } from 'revalidate'
 import { RootStoreContext } from '../stores/rootStore'
 import { IUserFormValues } from '../models/user'
 import TextInput from '../sharedComponents/formComponents/TextInput'
 import ErrorMessage from '../sharedComponents/formComponents/ErrorMessage'
+import SocialLogin from './login/SocialLogin'
+import { observer } from 'mobx-react-lite'
 
 const validate = combineValidators({
   email: isRequired('Email'),
@@ -15,7 +17,7 @@ const validate = combineValidators({
 
 const Login = () => {
   const rootStore = useContext(RootStoreContext)
-  const { login } = rootStore.userStore
+  const { login, fbLogin, loading } = rootStore.userStore
 
   const handleFinalFormSubmit = async (values: IUserFormValues) => {
     try {
@@ -42,35 +44,37 @@ const Login = () => {
       }) => (
         <Form onSubmit={handleSubmit} error>
           <Header
-            as="h2"
-            content="Log in to Reactivities"
-            color="teal"
-            textAlign="center"
+            as='h2'
+            content='Log in to Reactivities'
+            color='teal'
+            textAlign='center'
           />
-          <Field placeholder="Email" name="email" component={TextInput} />
+          <Field placeholder='Email' name='email' component={TextInput} />
           <Field
-            placeholder="Password"
-            name="password"
+            placeholder='Password'
+            name='password'
             component={TextInput}
-            type="password"
+            type='password'
           />
           {/* Show login errors */}
           {submitError && !dirtySinceLastSubmit && (
             <ErrorMessage
               error={submitError}
-              text="Invalid email or password."
+              text='Invalid email or password.'
             />
           )}
           <Button
-            type="submit"
-            color="teal"
-            content="Log In"
+            type='submit'
+            color='teal'
+            content='Log In'
             fluid
             loading={submitting}
             disabled={
               (submitting || !dirtySinceLastSubmit) && (invalid || pristine)
             }
           />
+          <Divider horizontal>Or</Divider>
+          <SocialLogin fbCallback={fbLogin} loading={loading}></SocialLogin>
           {/* <pre>{JSON.stringify(form.getState(), null, 2)}</pre> */}
         </Form>
       )}
@@ -78,4 +82,4 @@ const Login = () => {
   )
 }
 
-export default Login
+export default observer(Login)

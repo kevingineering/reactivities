@@ -25,5 +25,12 @@ namespace API.Controllers
     {
       return await Mediator.Send(new Application.User.CurrentUser.Query());
     }
+
+    [AllowAnonymous]
+    [HttpPost("facebook")]
+    public async Task<ActionResult<Application.User.UserDTO>> FbLogin(Application.User.ExternalLogin.Query query)
+    {
+      return await Mediator.Send(query);
+    }
   }
 }

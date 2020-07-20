@@ -12,6 +12,7 @@ export default class UserStore {
   }
 
   @observable user: IUser | null = null
+  @observable loading = false
 
   @computed get isLoggedIn() {
     return !!this.user
@@ -35,6 +36,26 @@ export default class UserStore {
       history.push('/activities')
     } catch (error) {
       throw error //and catch in login component
+    }
+  }
+
+  @action fbLogin = async (response: any) => {
+    try {
+      //attempt to login user
+      this.loading = true
+      const loginUser = await agent.Users.fbLogin(response.accessToken)
+
+      //set user in store
+      runInAction('login', () => {
+        this.user = loginUser
+        this.rootStore.commonStore.setToken(loginUser.token)
+        this.rootStore.modalStore.closeModal()
+        this.loading = false
+      })
+      history.push('/activities')
+    } catch (error) {
+      this.loading = false
+      throw error
     }
   }
 
