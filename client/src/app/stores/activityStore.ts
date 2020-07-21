@@ -11,6 +11,7 @@ import {
   HubConnectionBuilder,
   LogLevel,
 } from '@microsoft/signalr'
+import jwt from 'jsonwebtoken'
 
 const LIMIT = 2
 
@@ -49,7 +50,7 @@ export default class ActivityStore {
   @observable predicate = new Map()
 
   @action setPredicate = (predicate: string, value: string | Date) => {
-    this.predicate.clear();
+    this.predicate.clear()
     if (predicate !== 'all') {
       this.predicate.set(predicate, value)
     }
@@ -78,12 +79,29 @@ export default class ActivityStore {
     this.page = page
   }
 
+  checkTokenAndRefreshIfExpired = async () => {
+    const token = localStorage.getItem('jwt')
+    const refreshToken = localStorage.getItem('refreshToken')
+    if (token && refreshToken) {
+      const decodedToken: any = jwt.decode(token)
+      console.log(decodedToken)
+      if (decodedToken && Date.now() >= decodedToken.exp * 1000 - 5000) {
+        try {
+          return await agent.Users.refreshToken(token, refreshToken)
+        } catch (error) {
+          toast.error('Problem connecting to chat.')
+        }
+      } else {
+        return token
+      }
+    }
+  }
 
   @action createHubConnection = (activityId: string) => {
     this.hubConnection = new HubConnectionBuilder()
       .withUrl(process.env.REACT_APP_CHAT_URL!, {
         //string containing access token - usually we get token from Http header, but with signalR we get it from query string (different protocol)
-        accessTokenFactory: () => this.rootStore.commonStore.token!,
+        accessTokenFactory: () => this.checkTokenAndRefreshIfExpired(),
       })
       .configureLogging(LogLevel.Information)
       .build()
@@ -92,8 +110,9 @@ export default class ActivityStore {
     this.hubConnection
       .start()
       .then(() => {
-        // console.log('Attempting to join SignalR group.')
-        this.hubConnection!.invoke('AddToGroup', activityId)
+        if (this.hubConnection!.state === 'Connected') {
+          this.hubConnection!.invoke('AddToGroup', activityId)
+        }
       })
       .catch((error) => console.log(error))
 

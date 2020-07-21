@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Microsoft.AspNetCore.Identity; //IdentityUser
@@ -15,6 +16,8 @@ namespace Domain
 
     public string DisplayName { get; set; }
     public string Bio { get; set; }
+    public string RefreshToken { get; set; }
+    public DateTime RefreshTokenExpiry { get; set; }
 
     //relationships
     public virtual ICollection<UserActivity> UserActivities { get; set; }

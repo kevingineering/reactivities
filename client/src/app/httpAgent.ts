@@ -14,24 +14,49 @@ axios.defaults.baseURL = process.env.REACT_APP_API_URL
 //for every response, catch errors if they exist
 //takes two parameters - what to do when response is fulfilled, what to do when response is rejected
 axios.interceptors.response.use(undefined, (error) => {
+  const originalRequest = error.config
   if (error.message === 'Network Error' && !error.response) {
     toast.error('Network error - make sure API is running!')
   }
-  const { status, config, data, headers } = error.response
+  const { status, config, data } = error.response
   if (status === 404) {
     history.push('/notfound')
   }
-  //check to see if token has expired
-  if (
-    status === 401 &&
-    headers['www-authenticate'] &&
-    headers['www-authenticate'].includes(
-      'Bearer error="invalid_token", error_description="The token expired'
-    )
-  ) {
+  //if we've already tried refreshing and still catch an error
+  if (status === 401 && originalRequest.url.endsWith('refresh')) {
     window.localStorage.removeItem('jwt')
+    window.localStorage.removeItem('refreshTokne')
     history.push('/')
     toast.info('Your session has expired, please log in again to continue.')
+    return Promise.reject(error)
+  }
+  //try to refresh token if it has expired
+  if (
+    status === 401 &&
+    !originalRequest._retry
+    // headers['www-authenticate'] &&
+    // headers['www-authenticate'].includes(
+    //   'Bearer error="invalid_token", error_description="The token expired'
+    // )
+  ) {
+    originalRequest._retry = true
+    console.log(
+      window.localStorage.getItem('jwt'),
+      window.localStorage.getItem('refreshToken')
+    )
+    return axios
+      .post('user/refresh', {
+        token: window.localStorage.getItem('jwt'),
+        refreshToken: window.localStorage.getItem('refreshToken'),
+      })
+      .then((res) => {
+        window.localStorage.setItem('jwt', res.data.token)
+        window.localStorage.setItem('refreshToken', res.data.refreshToken)
+        axios.defaults.headers.common[
+          'Authorization'
+        ] = `Bearer ${res.data.token}`
+        return axios(originalRequest) //retry originally rejected request
+      })
   }
   //verification error if path requiring GUID is not sent GUID
   if (
@@ -115,6 +140,17 @@ const Users = {
     requests.post('/user/register', user),
   fbLogin: (accessToken: string): Promise<IUser> =>
     requests.post('/user/facebook', { accessToken }),
+  //specif request to get new token
+  refreshToken: (token: string, refreshToken: string) => {
+    return axios.post(`/user/refresh`, { token, refreshToken }).then((res) => {
+      window.localStorage.setItem('jwt', res.data.token)
+      window.localStorage.setItem('refreshToken', res.data.refreshToken)
+      axios.defaults.headers.common[
+        'Authorization'
+      ] = `Bearer ${res.data.token}`
+      return res.data.token
+    })
+  },
 }
 
 const Profiles = {

@@ -59,24 +59,29 @@ namespace Application.User
 
         if (await _context.Users.Where(x => x.UserName == request.UserName).AnyAsync())
           throw new Application.Errors.RestException(HttpStatusCode.BadRequest, new { UserName = "Username already exists." });
-        
+
         //create new user
         var user = new Domain.AppUser
         {
           DisplayName = request.DisplayName,
           UserName = request.UserName,
-          Email = request.Email
+          Email = request.Email,
+          RefreshToken = _jwtGenerator.CreateRefreshToken(),
+          RefreshTokenExpiry = DateTime.Now.AddDays(30)
         };
+
+        await _userManager.UpdateAsync(user);
 
         //user manager automatically salts and hashes password
         var result = await _userManager.CreateAsync(user, request.Password);
 
-        if(result.Succeeded) 
+        if (result.Succeeded)
         {
-          return new UserDTO 
+          return new UserDTO
           {
             DisplayName = user.DisplayName,
             Token = _jwtGenerator.CreateToken(user),
+            RefreshToken = _jwtGenerator.CreateRefreshToken(),
             UserName = user.UserName,
             Image = user.Photos.FirstOrDefault(x => x.IsMain)?.Url
           };

@@ -2,10 +2,12 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 
 namespace API.SignalR
 {
+  [Authorize] //validates expiry of token
   public class ChatHub : Hub
   {
     private readonly IMediator _mediator;
@@ -38,7 +40,7 @@ namespace API.SignalR
     {
       //add connection string into groupName group
       await Groups.AddToGroupAsync(Context.ConnectionId, groupName);
-      
+
       string userName = GetUserName();
 
       await Clients.Group(groupName).SendAsync("Send", $"{userName} has joined the group.");

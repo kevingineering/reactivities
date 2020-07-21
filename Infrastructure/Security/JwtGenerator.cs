@@ -2,6 +2,7 @@ using System; //DateTime
 using System.Collections.Generic; //List
 using System.IdentityModel.Tokens.Jwt; //JwtRegisteredClaimNames
 using System.Security.Claims; //Claim
+using System.Security.Cryptography;
 using System.Text; //Encoding
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens; //SymmetricSecurityKey, SigningCredentials, SecurityTokenDescriptor, JwtSecurityTokenHandler
@@ -33,7 +34,7 @@ namespace Infrastructure.Security
       var tokenDescriptor = new SecurityTokenDescriptor
       {
         Subject = new ClaimsIdentity(claims),
-        Expires = DateTime.UtcNow.AddDays(1),
+        Expires = DateTime.UtcNow.AddMinutes(15),
         SigningCredentials = creds
       };
 
@@ -43,6 +44,15 @@ namespace Infrastructure.Security
       var token = tokenHandler.CreateToken(tokenDescriptor);
 
       return tokenHandler.WriteToken(token);
+    }
+
+    //creates random string
+    public string CreateRefreshToken()
+    {
+      var randomNumber = new byte[32];
+      using var rng = RandomNumberGenerator.Create();
+      rng.GetBytes(randomNumber);
+      return Convert.ToBase64String(randomNumber);
     }
   }
 }

@@ -2,6 +2,7 @@
 export interface IUser {
   userName: string
   displayName: string
+  refreshToken: string
   token: string
   image?: string
 }

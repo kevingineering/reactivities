@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Net;
 using System.Threading;
@@ -56,20 +57,26 @@ namespace Application.User
         //check password
         var result = await _signInManager.CheckPasswordSignInAsync(user, request.Password, false);
 
-        //if password succeeded, return token
+        //if password succeeded, create and save refresh token and return JWT and token
         if (result.Succeeded)
         {
-            //TODO - return token
-            return new UserDTO {
-              DisplayName = user.DisplayName,
-              Token = _jwtGenerator.CreateToken(user),
-              UserName = user.UserName,
-              Image = user.Photos.FirstOrDefault(x => x.IsMain)?.Url
-            };
+          user.RefreshToken = _jwtGenerator.CreateRefreshToken();
+          user.RefreshTokenExpiry = DateTime.Now.AddDays(30);
+
+          await _userManager.UpdateAsync(user);
+
+          return new UserDTO
+          {
+            DisplayName = user.DisplayName,
+            Token = _jwtGenerator.CreateToken(user),
+            RefreshToken = user.RefreshToken,
+            UserName = user.UserName,
+            Image = user.Photos.FirstOrDefault(x => x.IsMain)?.Url
+          };
         }
         else //if password failed, return 401 
         {
-            throw new Application.Errors.RestException(HttpStatusCode.Unauthorized);
+          throw new Application.Errors.RestException(HttpStatusCode.Unauthorized);
         }
       }
     }

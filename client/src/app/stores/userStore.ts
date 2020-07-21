@@ -29,6 +29,7 @@ export default class UserStore {
       //set token in local storage
       runInAction('setToken', () => {
         this.rootStore.commonStore.setToken(loginUser.token)
+        this.rootStore.commonStore.setRefreshToken(loginUser.refreshToken)
       })
       //close modal
       this.rootStore.modalStore.closeModal()
@@ -49,6 +50,7 @@ export default class UserStore {
       runInAction('login', () => {
         this.user = loginUser
         this.rootStore.commonStore.setToken(loginUser.token)
+        this.rootStore.commonStore.setRefreshToken(loginUser.refreshToken)
         this.rootStore.modalStore.closeModal()
         this.loading = false
       })
@@ -62,6 +64,7 @@ export default class UserStore {
   @action logout = () => {
     //clear token from storage
     this.rootStore.commonStore.setToken(null)
+    this.rootStore.commonStore.setRefreshToken(null)
     //clear user
     this.user = null
     //redirect
@@ -79,6 +82,7 @@ export default class UserStore {
       //set token in local storage
       runInAction('setToken', () => {
         this.rootStore.commonStore.setToken(newUser.token)
+        this.rootStore.commonStore.setRefreshToken(newUser.refreshToken)
       })
       //close modal
       this.rootStore.modalStore.closeModal()
